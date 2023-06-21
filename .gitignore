@@ -10,3 +10,5 @@
 /WebAPI/Properties/PublishProfiles
 /WebAPI/obj
 /.vs/FusionWebApi/v17
+/WebAPI/bin/Debug/net7.0
+/.vs

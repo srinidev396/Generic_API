@@ -27,7 +27,7 @@ namespace FusionWebApi.Models
         public string ExpDate { get; set; }
         public Passport GetPassport(string userdata)
         {
-            var passport = new Passport(false);
+            var passport = new Passport();
             try
             {
                 var data = Encrypt.DecryptParameters(userdata);

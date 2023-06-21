@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <Platforms>AnyCPU;x86;ARM32</Platforms>
   </PropertyGroup>
 
@@ -22,20 +22,17 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.5.0" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.0" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
     <PackageReference Include="System.DirectoryServices.AccountManagement" Version="6.0.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.22.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="slimShared">
-      <HintPath>..\..\Bin\slimShared.dll</HintPath>
-    </Reference>
     <Reference Include="Smead.RecordsManagement">
-      <HintPath>..\..\Bin\Smead.RecordsManagement.dll</HintPath>
+      <HintPath>..\..\FS-WebAccess\Smead.RecordsManagementCS\bin\Debug\net7.0-windows\Smead.RecordsManagement.dll</HintPath>
     </Reference>
     <Reference Include="Smead.Security">
-      <HintPath>..\..\Bin\Smead.Security.dll</HintPath>
+      <HintPath>..\..\FS-WebAccess\Smead.SecurityCS\bin\Debug\net7.0-windows\Smead.Security.dll</HintPath>
     </Reference>
   </ItemGroup>
 
