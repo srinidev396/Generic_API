@@ -33,14 +33,14 @@ namespace FusionWebApi.Controllers
 
         [HttpGet]
         [Route("GetUserViews")]
-        public List<Navigation.ListOfviews> GetUserViews()
+        public async Task<List<Navigation.ListOfviews>> GetUserViews()
         {
             var lst = new List<Navigation.ListOfviews>();
             var m = new SecurityAccess(_config);
             var passport = m.GetPassport(User.Identity.Name);
             try
             {
-                lst = Navigation.GetAllUserViews(passport);
+                lst = await Task.Run(() => Navigation.GetAllUserViews(passport));
             }
             catch (Exception ex)
             {
@@ -50,14 +50,14 @@ namespace FusionWebApi.Controllers
         }
         [HttpGet]
         [Route("GetDbSchema")]
-        public List<GetDbSchema> GetDbSchema()
+        public async Task<List<GetDbSchema>> GetDbSchema()
         {
             var skl = new List<GetDbSchema>();
             var m = new SecurityAccess(_config);
             var passport = m.GetPassport(User.Identity.Name);
             try
             {
-                skl = DatabaseSchema.ReturnDbSchema(passport);
+                skl = await Task.Run(() => DatabaseSchema.ReturnDbSchema(passport));
             }
             catch (Exception ex)
             {
@@ -67,14 +67,14 @@ namespace FusionWebApi.Controllers
         }
         [HttpGet]
         [Route("GetTableSchema")]
-        public TablesSchema GetTableSchema(string TableName)
+        public async Task<TablesSchema> GetTableSchema(string TableName)
         {
             TablesSchema tc = new TablesSchema();
             var m = new SecurityAccess(_config);
             var passport = m.GetPassport(User.Identity.Name);
             try
             {
-                tc = DatabaseSchema.GetTableSchema(TableName, passport);
+                tc = await Task.Run(() => DatabaseSchema.GetTableSchema(TableName, passport));
             }
             catch (Exception ex)
             {
@@ -84,7 +84,7 @@ namespace FusionWebApi.Controllers
         }
         [HttpPost]
         [Route("NewRecord")]
-        public string NewRecord(UIPostModel userdata)
+        public async Task<string> NewRecord(UIPostModel userdata)
         {
             var msg = string.Empty;
             if (userdata.PostColomn.Count == 0) return "No column to post";
@@ -92,9 +92,9 @@ namespace FusionWebApi.Controllers
             var passport = m.GetPassport(User.Identity.Name);
             try
             {
-                DatabaseSchema.GetColumntype(passport, userdata);
+                await Task.Run(() => DatabaseSchema.GetColumntype(passport, userdata));
                 var addrecord = new RecordsActions(passport);
-                if (addrecord.AddNewRow(userdata))
+                if (await Task.Run(() => addrecord.AddNewRow(userdata)))
                 {
                     msg = $"New Record Added!";
                 }
@@ -115,7 +115,8 @@ namespace FusionWebApi.Controllers
         [Route("NewRecordMulti")]
         //[RequestSizeLimit(100_000_000)]
         [DisableRequestSizeLimit]
-        public string NewRecordMulti(UIPostModel userdata)
+        //[RequestSizeLimit(1048576)] limit to 1mb
+        public async Task<string> NewRecordMulti(UIPostModel userdata)
         {
             var msg = string.Empty;
             if (userdata.PostColumnsMulti.Count == 0) return "No rows to post";
@@ -123,9 +124,9 @@ namespace FusionWebApi.Controllers
             var passport = m.GetPassport(User.Identity.Name);
             try
             {
-                DatabaseSchema.GetColumntypeMulti(passport, userdata);
+                await Task.Run(() => DatabaseSchema.GetColumntypeMulti(passport, userdata));
                 var addrecord = new RecordsActions(passport);
-               msg = addrecord.AddNewRowMulti(userdata);
+                msg = await Task.Run(() => addrecord.AddNewRowMulti(userdata));
             }
             catch (Exception ex)
             {
@@ -137,7 +138,7 @@ namespace FusionWebApi.Controllers
         }
         [HttpPost]
         [Route("EditRecord")]
-        public string EditRecord(UIPostModel userdata)
+        public async Task<string> EditRecord(UIPostModel userdata)
         {
             var msg = string.Empty;
             if (userdata.PostColomn.Count == 0) return "No column to post";
@@ -145,9 +146,9 @@ namespace FusionWebApi.Controllers
             var passport = m.GetPassport(User.Identity.Name);
             try
             {
-                DatabaseSchema.GetColumntype(passport, userdata);
+                await Task.Run(() => DatabaseSchema.GetColumntype(passport, userdata));
                 var editrecord = new RecordsActions(passport);
-                if (editrecord.EditRow(userdata))
+                if (await Task.Run(() => editrecord.EditRow(userdata)))
                 {
                     msg = $"Record Updated!";
                 }
@@ -155,7 +156,7 @@ namespace FusionWebApi.Controllers
                 {
                     msg = $"insufficient permissions to Edit";
                 }
-                
+
             }
             catch (Exception ex)
             {
@@ -167,7 +168,7 @@ namespace FusionWebApi.Controllers
         }
         [HttpPost]
         [Route("EditRecordByColumn")]
-        public string EditRecordByColumn(UIPostModel userdata)
+        public async Task<string> EditRecordByColumn(UIPostModel userdata)
         {
             var msg = string.Empty;
             if (userdata.PostColomn.Count == 0) return "No column to post";
@@ -175,9 +176,9 @@ namespace FusionWebApi.Controllers
             var passport = m.GetPassport(User.Identity.Name);
             try
             {
-                DatabaseSchema.GetColumntype(passport, userdata);
+                await Task.Run(() => DatabaseSchema.GetColumntype(passport, userdata));
                 var editrecord = new RecordsActions(passport);
-                msg = editrecord.EditRecordByColumn(userdata);
+                msg = await Task.Run(() => editrecord.EditRecordByColumn(userdata));
             }
             catch (Exception ex)
             {
@@ -188,7 +189,7 @@ namespace FusionWebApi.Controllers
         }
         [HttpPost]
         [Route("EditIfNotExistAdd")]
-        public string EditIfNotExistAdd(UIPostModel userdata)
+        public async Task<string> EditIfNotExistAdd(UIPostModel userdata)
         {
             var msg = string.Empty;
             if (userdata.PostColomn.Count == 0) return "No column to post";
@@ -196,12 +197,12 @@ namespace FusionWebApi.Controllers
             var passport = m.GetPassport(User.Identity.Name);
             try
             {
-                DatabaseSchema.GetColumntype(passport, userdata);
+                await Task.Run(() => DatabaseSchema.GetColumntype(passport, userdata));
                 var record = new RecordsActions(passport);
-                msg = record.EditRecordByColumn(userdata);
+                msg = await Task.Run(() => record.EditRecordByColumn(userdata));
                 if (msg.Contains("0"))
                 {
-                    if (record.AddNewRow(userdata))
+                    if (await Task.Run(() => record.AddNewRow(userdata)))
                     {
                         msg = $"New Record Added!";
                     }

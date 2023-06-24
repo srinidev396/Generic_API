@@ -12,3 +12,5 @@
 /.vs/FusionWebApi/v17
 /WebAPI/bin/Debug/net7.0
 /.vs
+/Test_Client/bin/Debug/net6.0
+/WebAPI/bin/Release/net7.0
