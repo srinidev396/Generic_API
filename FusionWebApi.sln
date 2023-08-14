@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FusionWebApi", "WebAPI\Fusi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApp1", "Test_Client\ConsoleApp1.csproj", "{B11B49B4-F34E-45BC-86F9-27A36D2354EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FusionApiClient", "FusionApiClient\FusionApiClient.csproj", "{8722A34A-92B6-4777-95D9-A610AA649A31}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FusionApiClient", "FusionApiClient\FusionApiClient.csproj", "{8722A34A-92B6-4777-95D9-A610AA649A31}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

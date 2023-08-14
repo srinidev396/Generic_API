@@ -3,10 +3,13 @@
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <Platforms>AnyCPU;x86;ARM32</Platforms>
+    <UserSecretsId>6f3a3576-da19-4e97-b185-08cf5520cd3b</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <UseWindowsForms>false</UseWindowsForms>
   </PropertyGroup>
 
@@ -19,9 +22,10 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.8" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="6.0.0" />
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.22.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.18.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.5.0" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.0" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
     <PackageReference Include="System.DirectoryServices.AccountManagement" Version="6.0.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.22.0" />
@@ -29,7 +33,7 @@
 
   <ItemGroup>
     <Reference Include="Smead.RecordsManagement">
-      <HintPath>..\..\FS-WebAccess\Smead.RecordsManagementCS\bin\Debug\net7.0-windows\Smead.RecordsManagement.dll</HintPath>
+      <HintPath>..\..\FS-WebAccess\Smead.RecordsManagementCS\bin\Release\net7.0-windows\Smead.RecordsManagement.dll</HintPath>
     </Reference>
     <Reference Include="Smead.Security">
       <HintPath>..\..\FS-WebAccess\Smead.SecurityCS\bin\Debug\net7.0-windows\Smead.Security.dll</HintPath>
