@@ -11,12 +11,11 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 COPY ["WebAPI/FusionWebApi.csproj", "WebAPI/"]
-COPY [WebAPI/bin/Debug/net7.0/Smead.Security.dll, WebAPI/]
-
 
 RUN dotnet restore "WebAPI/FusionWebApi.csproj"
 COPY . .
 WORKDIR "/src/WebAPI"
+COPY dlls /src/WebAPI
 RUN dotnet build "FusionWebApi.csproj" -c Release -o /app/build
 
 FROM build AS publish
