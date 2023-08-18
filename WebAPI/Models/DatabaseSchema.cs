@@ -53,6 +53,7 @@ namespace FusionWebApi.Models
                     }
                 }
                 conn.Close();
+                skl.Add(new GetDbSchema { TableName = TempTableName, ColumnCount = lst.Count, ListOfColumns = lst });
             }
             skl.OrderBy(a => a.TableName);
             return skl;

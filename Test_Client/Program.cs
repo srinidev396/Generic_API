@@ -89,9 +89,9 @@ else
 //Console.ReadLine();
 
 //###GET_DB_SCHEMEA_SYNC###
-//var getschema = await CallApi.GetDbSchemeAsync(client, url);
-//Console.WriteLine(getschema.ToString());
-//Console.ReadLine();
+var getschema = await CallApi.GetDbSchemeAsync(client, url);
+Console.WriteLine(getschema.ToString());
+Console.ReadLine();
 
 //###GET_TABLE_SCHEMA###
 //var getTableSchema = await CallApi.GetTableSchema(client, url, "Deals");
@@ -99,13 +99,13 @@ else
 //Console.ReadLine();
 
 //###GET_VIEW-DATA
-var start = DateTime.Now;
-var getviewdata = await CallApi.GetViewdata(client, url, 101, 1);
-var end = DateTime.Now;
-var seconds = Math.Round((end - start).TotalSeconds);
-Console.WriteLine($"Total second: {seconds}");
-Console.WriteLine(getviewdata.ToString());
-Console.ReadLine();
+//var start = DateTime.Now;
+//var getviewdata = await CallApi.GetViewdata(client, url, 101, 1);
+//var end = DateTime.Now;
+//var seconds = Math.Round((end - start).TotalSeconds);
+//Console.WriteLine($"Total second: {seconds}");
+//Console.WriteLine(getviewdata.ToString());
+//Console.ReadLine();
 
 
 
