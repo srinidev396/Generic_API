@@ -186,6 +186,16 @@ namespace ConsoleApp1
             }
             return data;
         }
+        public async static Task<string> GetViewdata(HttpClient client, string url, int viewid, int pagenumber)
+        {
+            var model = string.Empty;
+            var call = await client.GetAsync($"{url}/Data/GetViewData?viewid={viewid}&pageNumber={pagenumber}");
+            if(call.IsSuccessStatusCode)
+            {
+                model = await call.Content.ReadAsStringAsync();
+            }
+            return model;
+        }
         public async static void TestException(HttpClient client, string url)
         {
             string data = String.Empty;

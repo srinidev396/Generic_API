@@ -11,8 +11,8 @@ using System.Linq;
 
 
 //Get token
-string url = "https://restapi.tabfusionrms.com";  //"http://localhost:5001"
-string DatabaseName = "financedemo";
+string url = "http://localhost:5000"; //"https://restapi.tabfusionrms.com";
+string DatabaseName = "cfg";
 string UserName = "administrator";
 string Password = "password$";
 string token = String.Empty;
@@ -78,15 +78,15 @@ else
 //Console.ReadLine();
 
 //##ADD_MULTIPL_RECORD
-var start = DateTime.Now;
-var call = await CallApi.AddNewRecoredMulti(client, url);
-var end = DateTime.Now;
-var hours = Math.Round((end - start).TotalHours);
-var minutes = Math.Round((end - start).TotalMinutes);
-var seconds = Math.Round((end - start).TotalSeconds);
+//var start = DateTime.Now;
+//var call = await CallApi.AddNewRecoredMulti(client, url);
+//var end = DateTime.Now;
+//var hours = Math.Round((end - start).TotalHours);
+//var minutes = Math.Round((end - start).TotalMinutes);
+//var seconds = Math.Round((end - start).TotalSeconds);
 
-Console.WriteLine($"Msg from API:  EVAN - WE DID IT {call.ToString()} in {hours}:{minutes}:{seconds} AMAZING!");
-Console.ReadLine();
+//Console.WriteLine($"Msg from API:  EVAN - WE DID IT {call.ToString()} in {hours}:{minutes}:{seconds} AMAZING!");
+//Console.ReadLine();
 
 //###GET_DB_SCHEMEA_SYNC###
 //var getschema = await CallApi.GetDbSchemeAsync(client, url);
@@ -97,6 +97,15 @@ Console.ReadLine();
 //var getTableSchema = await CallApi.GetTableSchema(client, url, "Deals");
 //Console.WriteLine(getTableSchema.ToString());
 //Console.ReadLine();
+
+//###GET_VIEW-DATA
+var start = DateTime.Now;
+var getviewdata = await CallApi.GetViewdata(client, url, 101, 1);
+var end = DateTime.Now;
+var seconds = Math.Round((end - start).TotalSeconds);
+Console.WriteLine($"Total second: {seconds}");
+Console.WriteLine(getviewdata.ToString());
+Console.ReadLine();
 
 
 
