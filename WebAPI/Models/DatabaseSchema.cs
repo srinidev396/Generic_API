@@ -219,6 +219,7 @@ namespace FusionWebApi.Models
         public TablesSchema()
         {
             ListOfColumns = new List<Columns>();
+            ErrorMessages = new ErrorMessages();
             //ListOfColumn = new List<List<Columns>>();
         }
         public string TableName { get; set; }
@@ -247,6 +248,10 @@ namespace FusionWebApi.Models
 
     public class SchemaModel
     {
+        public SchemaModel()
+        {
+                ErrorMessages = new ErrorMessages();
+        }
         public List<GetDbSchema> getDbSchemas { get; set; }
         public ErrorMessages ErrorMessages { get; set; } 
     }

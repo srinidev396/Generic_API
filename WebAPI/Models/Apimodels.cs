@@ -93,6 +93,10 @@ namespace FusionWebApi.Models
     }
     public class Records
     {
+        public Records()
+        {
+            ErrorMessages = new ErrorMessages();
+        }
         public string FusionMessage { get; set; }
         public ErrorMessages ErrorMessages { get; set; }
     }

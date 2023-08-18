@@ -270,7 +270,8 @@ namespace FusionWebApi.Controllers
             var passport = m.GetPassport(User.Identity.Name);
             try
             {
-                throw new ArgumentException("This is an intentional test exception by Moti Mashiah");
+
+                throw new ArgumentException("This is an intentional test exception by FusionRMS");
             }
             catch (Exception ex)
             {
@@ -288,7 +289,6 @@ namespace FusionWebApi.Controllers
             var v = new RecordsActions(passport);
             try
             {
-                throw new ArgumentException("this is shit");
                 if (viewid > 0)
                 {
                     getview = await Task.Run(() => v.GetviewData(viewid, pageNumber));
@@ -298,7 +298,7 @@ namespace FusionWebApi.Controllers
             catch (Exception ex)
             {
                 getview.ErrorMessages.Code = ex.HResult;
-                getview.ErrorMessages.Message = $"Hello this is a message from API {ex.Message}";
+                getview.ErrorMessages.Message = ex.Message;
                 getview.ErrorMessages.TimeStemp = DateTime.Now;
             }
 
