@@ -234,6 +234,30 @@ namespace FusionWebApi.Controllers
                 LogErrorMessages.LogErrorMessage(ex, passport);
             }
         }
+        [HttpGet]
+        [Route("GetViewData")]
+        public async Task<Viewmodel> GetViewData(int viewid, int pageNumber)
+        {
+            var getview = new Viewmodel();
+            var m = new SecurityAccess(_config);
+            var passport = m.GetPassport(User.Identity.Name);
+            var v = new RecordsActions(passport);
+            try
+            {
+                if (viewid > 0)
+                {
+                    getview = await Task.Run(() => v.GetviewData(viewid, pageNumber));
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            return getview;
+        }
+
+
 
     }
 

@@ -6,6 +6,10 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Linq;
 using System.Drawing.Imaging;
+using System.Runtime.Versioning;
+using Microsoft.VisualBasic;
+using System.Data.SqlClient;
+using System.Diagnostics;
 
 namespace FusionWebApi.Models
 {
@@ -173,5 +177,197 @@ namespace FusionWebApi.Models
             }
             return afteradd;
         }
+        //return view 
+        public Viewmodel GetviewData(int viewid, int pageNumber)
+        {
+            var v = new Viewmodel();
+            var query = new Query(passport);
+            var param = new Parameters(viewid, passport);
+            if (passport.CheckPermission(param.ViewName, Smead.Security.SecureObject.SecureObjectType.View, Permissions.Permission.View))
+            {
+                param.Paged = true;
+                param.PageIndex = pageNumber;
+                query.FillData(param);
+                v.TotalRowsQuery = TotalQueryRowCount(param.TotalRowsQuery, passport.Connection());
+                v.RowPerPage = param.Data.Rows.Count;
+                v.TableName = param.TableName;
+                v.ViewName = param.ViewName;
+                v.Viewid = param.ViewId;
+                v.PageNumber = pageNumber;
+                
+
+                v.ListOfHeaders = BuildNewTableHeaderData(param);
+                v.ListOfDatarows = Buildrows(param);
+            }
+            else
+            {
+                //no permission
+            }
+            
+            return v;
+        }
+        private List<TableHeadersProperty> BuildNewTableHeaderData(Parameters param)
+        {
+            int columnOrder = 0;
+            var ListOfHeaders = new List<TableHeadersProperty>();
+            ListOfHeaders.Add(new TableHeadersProperty("pkey", "False", "none", "False", "False", columnOrder, "", false, "", "", false, 0, false));
+            foreach (DataColumn col in param.Data.Columns)
+            {
+                if (ShowColumn(col, 0, param.ParentField))
+                {
+                    string dataType = col.DataType.Name;
+                    var headerName = col.ExtendedProperties["heading"];
+                    var isSortable = col.ExtendedProperties["sortable"];
+                    var isdropdown = col.ExtendedProperties["dropdownflag"];
+                    var isEditable = col.ExtendedProperties["editallowed"];
+                    var editmask = col.ExtendedProperties["editmask"];
+                    int MaxLength = col.MaxLength;
+                    bool isCounterField = false;
+                    if (dataType == "Int16")
+                    {
+                        MaxLength = 5;
+                    }
+                    else if (dataType == "Int32")
+                    {
+                        MaxLength = 10;
+                    }
+                    else if (dataType == "Double")
+                    {
+                        MaxLength = 53;
+                    }
+
+                    var dataTypeFullName = col.DataType.FullName;
+                    string ColumnName = col.ColumnName;
+                    columnOrder = columnOrder + 1;
+                    // build dropdown table
+                    bool PrimaryKey = false;
+                    if ((param.PrimaryKey ?? "") == (ColumnName ?? ""))
+                    {
+                        isCounterField = !string.IsNullOrEmpty(param.TableInfo["CounterFieldName"].ToString());
+                        ListOfHeaders.Add(new TableHeadersProperty(Convert.ToString(headerName).ToString(), Convert.ToString(isSortable), dataType, Convert.ToString(isdropdown), Convert.ToString(isEditable), columnOrder, Convert.ToString(editmask), col.AllowDBNull, dataTypeFullName, ColumnName, true, MaxLength, isCounterField));
+                        PrimaryKey = true;
+                    }
+                    else
+                    {
+                        ListOfHeaders.Add(new TableHeadersProperty(Convert.ToString(headerName), Convert.ToString(isSortable), dataType, Convert.ToString(isdropdown), Convert.ToString(isEditable), columnOrder, Convert.ToString(editmask), col.AllowDBNull, dataTypeFullName, ColumnName, false, MaxLength, isCounterField));
+                    }
+                }
+            }
+            return ListOfHeaders;
+        }
+        private List<List<string>> Buildrows(Parameters param)
+        {
+            var ListOfColumn = new List<string>();
+            var ListOfDatarows = new List<List<string>>();
+            // build rows
+            foreach (DataRow dr in param.Data.Rows)
+            {
+                // 'get the pkey
+                string dataColumn = "";
+                dataColumn = dr["pkey"].ToString();
+                ListOfColumn.Add(dataColumn);
+                foreach (DataColumn col in param.Data.Columns)
+                {
+                    // If Not dr(col.ColumnName).GetType.ToString.ToLower = "system.boolean" And Not dr(col.ColumnName).GetType.ToString.ToLower = "system.datetime" Then
+                    if (ShowColumn(col, 0, param.ParentField) & col.ColumnName.ToString().Length > 0)
+                    {
+                        if (Convert.ToString(col.ColumnName) is not null)
+                        {
+
+                            if (!string.IsNullOrEmpty(dr[col.ColumnName].ToString()))
+                            {
+                                if (col.DataType.Name == "DateTime")
+                                {
+                                    dataColumn = Convert.ToString(dr[col.ColumnName.ToString()]).Split(" ")[0];
+                                }
+                                else
+                                {
+                                    dataColumn = Convert.ToString(dr[col.ColumnName.ToString()]);
+                                }
+                            }
+                            else
+                            {
+                                dataColumn = "";
+                            }
+                        }
+                        ListOfColumn.Add(dataColumn);
+                    }
+                }
+                ListOfDatarows.Add(ListOfColumn);
+                ListOfColumn = new List<string>();
+            }
+            return ListOfDatarows;
+        }
+        private static bool ShowColumn(DataColumn col, int crumblevel, string parentField)
+        {
+            switch (Convert.ToInt32(col.ExtendedProperties["columnvisible"]))
+            {
+                case 3:  // Not visible
+                    {
+                        return false;
+                    }
+                case 1:  // Visible on level 1 only
+                    {
+                        if (crumblevel != 0)
+                            return false;
+                        break;
+                    }
+                case 2:  // Visible on level 2 and below only
+                    {
+                        if (crumblevel < 1)
+                            return false;
+                        break;
+                    }
+                case 4:  // Smart column- not visible in a drill down when it's the parent.
+                    {
+                        if (crumblevel > 0 & (parentField.ToLower() ?? "") == (col.ColumnName.ToLower() ?? ""))
+                        {
+                            return false;
+                        }
+
+                        break;
+                    }
+            }
+
+            if (col.ColumnName.ToLower() == "formattedid")
+                return false;
+            // If col.ColumnName.ToLower = "id" Then Return False
+            if (col.ColumnName.ToLower() == "attachments")
+                return false;
+            if (col.ColumnName.ToLower() == "slrequestable")
+                return false;
+            if (col.ColumnName.ToLower() == "itemname")
+                return false;
+            if (col.ColumnName.ToLower() == "pkey")
+                return false;
+            if (col.ColumnName.ToLower() == "dispositionstatus")
+                return false;
+            if (col.ColumnName.ToLower() == "processeddescfieldnameone")
+                return false;
+            if (col.ColumnName.ToLower() == "processeddescfieldnametwo")
+                return false;
+            if (col.ColumnName.ToLower() == "rownum")
+                return false;
+            return true;
+        }
+
+        private static int TotalQueryRowCount(string sql, SqlConnection conn)
+        {
+            using (var cmd = new SqlCommand("SELECT COUNT(*) " + Strings.Right(sql, sql.Length - Strings.InStr(sql, " FROM ", CompareMethod.Text)), conn))
+            {
+                cmd.CommandTimeout = 60;
+
+                try
+                {
+                    return (int)(cmd.ExecuteScalar());
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                    return 0;
+                }
+            }
+        }
+
     }
 }
