@@ -33,61 +33,74 @@ namespace FusionWebApi.Controllers
 
         [HttpGet]
         [Route("GetUserViews")]
-        public async Task<List<Navigation.ListOfviews>> GetUserViews()
+        public async Task<UserViews> GetUserViews()
         {
-            var lst = new List<Navigation.ListOfviews>();
+            var model = new UserViews();
             var m = new SecurityAccess(_config);
             var passport = m.GetPassport(User.Identity.Name);
             try
             {
-                lst = await Task.Run(() => Navigation.GetAllUserViews(passport));
+                model.listOfviews = await Task.Run(() => Navigation.GetAllUserViews(passport));
             }
             catch (Exception ex)
             {
-                LogErrorMessages.LogErrorMessage(ex, passport);
+                model.ErrorMessages.Code = ex.HResult;
+                model.ErrorMessages.Message = ex.Message;
+                model.ErrorMessages.TimeStemp = DateTime.Now;
+                //LogErrorMessages.LogErrorMessage(ex, passport);
             }
-            return lst;
+            return model;
         }
         [HttpGet]
         [Route("GetDbSchema")]
-        public async Task<List<GetDbSchema>> GetDbSchema()
+        public async Task<SchemaModel> GetDbSchema()
         {
-            var skl = new List<GetDbSchema>();
+            var model = new SchemaModel();
             var m = new SecurityAccess(_config);
             var passport = m.GetPassport(User.Identity.Name);
             try
             {
-                skl = await Task.Run(() => DatabaseSchema.ReturnDbSchema(passport));
+                model.getDbSchemas = await Task.Run(() => DatabaseSchema.ReturnDbSchema(passport));
             }
             catch (Exception ex)
             {
-                LogErrorMessages.LogErrorMessage(ex, passport);
+                model.ErrorMessages.Code = ex.HResult;
+                model.ErrorMessages.Message = ex.Message;
+                model.ErrorMessages.TimeStemp = DateTime.Now;
+                //LogErrorMessages.LogErrorMessage(ex, passport);
             }
-            return skl;
+            return model;
         }
         [HttpGet]
         [Route("GetTableSchema")]
         public async Task<TablesSchema> GetTableSchema(string TableName)
         {
-            TablesSchema tc = new TablesSchema();
+            TablesSchema model = new TablesSchema();
             var m = new SecurityAccess(_config);
             var passport = m.GetPassport(User.Identity.Name);
             try
             {
-                tc = await Task.Run(() => DatabaseSchema.GetTableSchema(TableName, passport));
+                model = await Task.Run(() => DatabaseSchema.GetTableSchema(TableName, passport));
             }
             catch (Exception ex)
             {
-                LogErrorMessages.LogErrorMessage(ex, passport);
+                model.ErrorMessages.Code = ex.HResult;
+                model.ErrorMessages.Message = ex.Message;
+                model.ErrorMessages.TimeStemp = DateTime.Now;
+                // LogErrorMessages.LogErrorMessage(ex, passport);
             }
-            return tc;
+            return model;
         }
         [HttpPost]
         [Route("NewRecord")]
-        public async Task<string> NewRecord(UIPostModel userdata)
+        public async Task<Records> NewRecord(UIPostModel userdata)
         {
-            var msg = string.Empty;
-            if (userdata.PostColomn.Count == 0) return "No column to post";
+            var model = new Records();
+            if (userdata.PostColomn.Count == 0)
+            {
+                model.FusionMessage = "No column to post";
+                return model;
+            } 
             var m = new SecurityAccess(_config);
             var passport = m.GetPassport(User.Identity.Name);
             try
@@ -96,52 +109,67 @@ namespace FusionWebApi.Controllers
                 var addrecord = new RecordsActions(passport);
                 if (await Task.Run(() => addrecord.AddNewRow(userdata)))
                 {
-                    msg = $"New Record Added!";
+                    model.FusionMessage = $"New Record Added!";
+                    return model; 
                 }
                 else
                 {
-                    msg = $"Insufficient permissions to Add";
+                    model.FusionMessage = $"Insufficient permissions to Add";
+                    return model;
                 }
             }
             catch (Exception ex)
             {
-                LogErrorMessages.LogErrorMessage(ex, passport);
-                msg = ex.Message;
+                model.ErrorMessages.Code = ex.HResult;
+                model.ErrorMessages.Message = ex.Message;
+                model.ErrorMessages.TimeStemp = DateTime.Now;
+                //LogErrorMessages.LogErrorMessage(ex, passport);
             }
             //var rr = HttpContext.Connection.RemoteIpAddress.MapToIPv4();
-            return msg;
+            return model;
         }
         [HttpPost]
         [Route("NewRecordMulti")]
         //[RequestSizeLimit(100_000_000)]
         [DisableRequestSizeLimit]
         //[RequestSizeLimit(1048576)] limit to 1mb
-        public async Task<string> NewRecordMulti(UIPostModel userdata)
+        public async Task<Records> NewRecordMulti(UIPostModel userdata)
         {
-            var msg = string.Empty;
-            if (userdata.PostColumnsMulti.Count == 0) return "No rows to post";
+            var model = new Records();
+            if (userdata.PostColumnsMulti.Count == 0)
+            {
+                model.FusionMessage = "No rows to post";
+                return model;
+            }
             var m = new SecurityAccess(_config);
             var passport = m.GetPassport(User.Identity.Name);
             try
             {
                 await Task.Run(() => DatabaseSchema.GetColumntypeMulti(passport, userdata));
                 var addrecord = new RecordsActions(passport);
-                msg = await Task.Run(() => addrecord.AddNewRowMulti(userdata));
+                model.FusionMessage = await Task.Run(() => addrecord.AddNewRowMulti(userdata));
             }
             catch (Exception ex)
             {
-                LogErrorMessages.LogErrorMessage(ex, passport);
-                msg = ex.Message;
+                model.ErrorMessages.Code = ex.HResult;
+                model.ErrorMessages.Message = ex.Message;
+                model.ErrorMessages.TimeStemp = DateTime.Now;
+                //LogErrorMessages.LogErrorMessage(ex, passport);
             }
             //var rr = HttpContext.Connection.RemoteIpAddress.MapToIPv4();
-            return msg;
+            return model;
         }
         [HttpPost]
         [Route("EditRecord")]
-        public async Task<string> EditRecord(UIPostModel userdata)
+        public async Task<Records> EditRecord(UIPostModel userdata)
         {
-            var msg = string.Empty;
-            if (userdata.PostColomn.Count == 0) return "No column to post";
+
+            var model = new Records();
+            if (userdata.PostColomn.Count == 0)
+            {
+                model.FusionMessage = "No column to post";
+                return model;
+            } 
             var m = new SecurityAccess(_config);
             var passport = m.GetPassport(User.Identity.Name);
             try
@@ -150,74 +178,89 @@ namespace FusionWebApi.Controllers
                 var editrecord = new RecordsActions(passport);
                 if (await Task.Run(() => editrecord.EditRow(userdata)))
                 {
-                    msg = $"Record Updated!";
+                    model.FusionMessage = $"Record Updated!";
                 }
                 else
                 {
-                    msg = $"insufficient permissions to Edit";
+                    model.FusionMessage = $"insufficient permissions to Edit";
                 }
 
             }
             catch (Exception ex)
             {
+                model.ErrorMessages.Code = ex.HResult;
+                model.ErrorMessages.Message = ex.Message;
+                model.ErrorMessages.TimeStemp = DateTime.Now;
                 LogErrorMessages.LogErrorMessage(ex, passport);
-                msg = ex.Message;
+                
             }
 
-            return msg;
+            return model;
         }
         [HttpPost]
         [Route("EditRecordByColumn")]
-        public async Task<string> EditRecordByColumn(UIPostModel userdata)
+        public async Task<Records> EditRecordByColumn(UIPostModel userdata)
         {
-            var msg = string.Empty;
-            if (userdata.PostColomn.Count == 0) return "No column to post";
+            var model = new Records();
+            if (userdata.PostColomn.Count == 0)
+            {
+                model.FusionMessage  = "No column to post";
+                return model;
+            }
+                
             var m = new SecurityAccess(_config);
             var passport = m.GetPassport(User.Identity.Name);
             try
             {
                 await Task.Run(() => DatabaseSchema.GetColumntype(passport, userdata));
                 var editrecord = new RecordsActions(passport);
-                msg = await Task.Run(() => editrecord.EditRecordByColumn(userdata));
+                model.FusionMessage = await Task.Run(() => editrecord.EditRecordByColumn(userdata));
             }
             catch (Exception ex)
             {
-                LogErrorMessages.LogErrorMessage(ex, passport);
-                msg = ex.Message;
+                model.ErrorMessages.Code = ex.HResult;
+                model.ErrorMessages.Message = ex.Message;
+                model.ErrorMessages.TimeStemp = DateTime.Now;
+                //LogErrorMessages.LogErrorMessage(ex, passport);
             }
-            return msg;
+            return model;
         }
         [HttpPost]
         [Route("EditIfNotExistAdd")]
-        public async Task<string> EditIfNotExistAdd(UIPostModel userdata)
+        public async Task<Records> EditIfNotExistAdd(UIPostModel userdata)
         {
-            var msg = string.Empty;
-            if (userdata.PostColomn.Count == 0) return "No column to post";
+            var model = new Records();
+            if (userdata.PostColomn.Count == 0)
+            {
+                model.FusionMessage = "No column to post";
+                return model;
+            }
+                
             var m = new SecurityAccess(_config);
             var passport = m.GetPassport(User.Identity.Name);
             try
             {
                 await Task.Run(() => DatabaseSchema.GetColumntype(passport, userdata));
                 var record = new RecordsActions(passport);
-                msg = await Task.Run(() => record.EditRecordByColumn(userdata));
-                if (msg.Contains("0"))
+                model.FusionMessage = await Task.Run(() => record.EditRecordByColumn(userdata));
+                if (model.FusionMessage.Contains("0"))
                 {
                     if (await Task.Run(() => record.AddNewRow(userdata)))
                     {
-                        msg = $"New Record Added!";
+                        model.FusionMessage = $"New Record Added!";
                     }
                     else
                     {
-                        msg = $"Insufficient permissions to Add";
+                        model.FusionMessage = $"Insufficient permissions to Add";
                     }
                 }
             }
             catch (Exception ex)
             {
                 LogErrorMessages.LogErrorMessage(ex, passport);
-                msg = ex.Message;
+                model.FusionMessage = ex.Message;
             }
-            return msg;
+            return model;
         }
         [HttpGet]
         [Route("TestExceptionMethod")]
@@ -238,26 +281,29 @@ namespace FusionWebApi.Controllers
         [Route("GetViewData")]
         public async Task<Viewmodel> GetViewData(int viewid, int pageNumber)
         {
+            
             var getview = new Viewmodel();
             var m = new SecurityAccess(_config);
             var passport = m.GetPassport(User.Identity.Name);
             var v = new RecordsActions(passport);
             try
             {
+                throw new ArgumentException("this is shit");
                 if (viewid > 0)
                 {
                     getview = await Task.Run(() => v.GetviewData(viewid, pageNumber));
                 }
             }
-            catch (Exception)
+         
+            catch (Exception ex)
             {
-                throw;
+                getview.ErrorMessages.Code = ex.HResult;
+                getview.ErrorMessages.Message = $"Hello this is a message from API {ex.Message}";
+                getview.ErrorMessages.TimeStemp = DateTime.Now;
             }
 
             return getview;
         }
-
-
 
     }
 

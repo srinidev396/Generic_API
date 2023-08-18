@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Smead.RecordsManagement;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -34,14 +35,19 @@ namespace FusionWebApi.Models
 
     public class Viewmodel
     {
+        public Viewmodel()
+        {
+            ErrorMessages = new ErrorMessages();
+        }
         public List<TableHeadersProperty> ListOfHeaders { get; set; }
-        public List<List<string>> ListOfDatarows { get; set; }    
+        public List<List<string>> ListOfDatarows { get; set; }
+        public ErrorMessages ErrorMessages { get; set; }
         public int TotalRowsQuery { get; set; }
-        public int RowPerPage { get;set; }
+        public int RowPerPage { get; set; }
         public int Viewid { get; set; }
         public string TableName { get; set; }
         public string ViewName { get; set; }
-        public int PageNumber { get; set;}
+        public int PageNumber { get; set; }
     }
 
     public class TableHeadersProperty
@@ -76,5 +82,32 @@ namespace FusionWebApi.Models
         public int MaxLength { get; set; }
         public bool isCounterField { get; set; }
     }
+    public class UserViews
+    {
+        public UserViews()
+        {
+            ErrorMessages = new ErrorMessages();
+        }
+        public List<Navigation.ListOfviews> listOfviews {  get; set; }
+        public ErrorMessages ErrorMessages { get; set; }
+    }
+    public class Records
+    {
+        public string FusionMessage { get; set; }
+        public ErrorMessages ErrorMessages { get; set; }
+    }
+
+
+    public class ErrorMessages
+    {
+        public int Code { get; set; }
+        public string Message { get; set; }
+        public DateTime TimeStemp { get; set; }
+        public void LogErrorMessage(string code, string message, DateTime dateTime)
+        {
+
+        }
+    }
+
 
 }

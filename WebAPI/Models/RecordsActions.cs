@@ -194,8 +194,6 @@ namespace FusionWebApi.Models
                 v.ViewName = param.ViewName;
                 v.Viewid = param.ViewId;
                 v.PageNumber = pageNumber;
-                
-
                 v.ListOfHeaders = BuildNewTableHeaderData(param);
                 v.ListOfDatarows = Buildrows(param);
             }

@@ -224,6 +224,7 @@ namespace FusionWebApi.Models
         public string TableName { get; set; }
         public int ColumsCount { get; set; }
         public List<Columns> ListOfColumns { get; set; }
+        public ErrorMessages ErrorMessages { get; set; }
     }
     public class Columns
     {
@@ -243,4 +244,11 @@ namespace FusionWebApi.Models
         public string TableName { get; set; }
         public int ColumnCount { get; set; }
     }
+
+    public class SchemaModel
+    {
+        public List<GetDbSchema> getDbSchemas { get; set; }
+        public ErrorMessages ErrorMessages { get; set; } 
+    }
+
 }
