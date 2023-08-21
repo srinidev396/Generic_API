@@ -38,7 +38,7 @@ namespace FusionWebApi.Models
 
                         if (TempTableName != tableName && TempTableName != String.Empty)
                         {
-                            ListOfColumn.Add(lst);
+                            ListOfColumn.Add(lst); 
                             skl.Add(new GetDbSchema { TableName = TempTableName, ColumnCount = lst.Count, ListOfColumns = lst });
                             lst = new List<Columns>();
 
