@@ -33,7 +33,7 @@
 
   <ItemGroup>
     <Reference Include="Smead.RecordsManagement">
-      <HintPath>..\..\FS-WebAccess\Smead.RecordsManagementCS\bin\Debug\net7.0-windows\Smead.RecordsManagement.dll</HintPath>
+      <HintPath>..\..\FS-WebAccess\Smead.RecordsManagementCS\bin\Debug\net7.0\Smead.RecordsManagement.dll</HintPath>
     </Reference>
     <Reference Include="Smead.Security">
       <HintPath>..\..\FS-WebAccess\Smead.SecurityCS\bin\Debug\net7.0-windows\Smead.Security.dll</HintPath>
