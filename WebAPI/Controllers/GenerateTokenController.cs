@@ -38,7 +38,6 @@ namespace FusionWebApi.Controllers
             catch (Exception ex)
             {
                 token = ex.Message;
-                return token;
             }
 
             var jw = new JwtService(m);
@@ -56,7 +55,7 @@ namespace FusionWebApi.Controllers
             }
             else
             {
-                token = "Faild to authenticate!";
+                token = "Faild to authenticate, username or password are incorrect!";
             }
 
             return token;

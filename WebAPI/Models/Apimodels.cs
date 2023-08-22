@@ -107,6 +107,8 @@ namespace FusionWebApi.Models
         public int Code { get; set; }
         public string Message { get; set; }
         public DateTime TimeStemp { get; set; }
+        public string FusionMessage { get; set; }
+        public int FusionCode { get; set; }
         public void LogErrorMessage(string code, string message, DateTime dateTime)
         {
 
