@@ -19,12 +19,16 @@ namespace FusionWebApi.Models
             sqlServername = config.GetSection("Sql").GetSection("serverName").Value;
             Secret = config.GetSection("JwtConfig").GetSection("secret").Value;
             ExpDate = config.GetSection("JwtConfig").GetSection("expirationInMinutes").Value;
+            ErrorMessages = new ErrorMessages();
         }
-        public string sqlServername { get; set; }
-        public string sqlUsername { get; set; }
-        public string sqlPassword { get; set; }
-        public string Secret { get; set; }
+   
+        internal string sqlServername { get; set; }
+        internal string sqlUsername { get; set; }
+        internal string sqlPassword { get; set; }
+        internal string Secret { get; set; }
         public string ExpDate { get; set; }
+        public ErrorMessages ErrorMessages { get; set; }
+        public string Token { get; set; }
         public Passport GetPassport(string userdata)
         {
             var passport = new Passport();
@@ -47,6 +51,7 @@ namespace FusionWebApi.Models
 
             return passport;
         }
+
 
     }
 

@@ -115,5 +115,13 @@ namespace FusionWebApi.Models
         }
     }
 
+    public enum EventCode
+    {
+        None = 0,
+        LoginFail = -1,
+        LoginSuccess = 1,
+
+    }
+
 
 }

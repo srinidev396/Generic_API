@@ -50,8 +50,4 @@
     <None Remove="..\.dockerignore" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Logs\" />
-  </ItemGroup>
-
 </Project>

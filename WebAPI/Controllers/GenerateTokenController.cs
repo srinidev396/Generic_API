@@ -11,6 +11,8 @@ using Newtonsoft.Json;
 using FusionWebApi.Models;
 using Newtonsoft.Json.Linq;
 using Microsoft.Extensions.Logging;
+using System.Drawing;
+using System.Linq.Expressions;
 
 namespace FusionWebApi.Controllers
 {
@@ -20,17 +22,20 @@ namespace FusionWebApi.Controllers
     {
         private Passport passport;
         IConfiguration _config;
-        private ILogger<DataController> _logger;
-        public GenerateTokenController(IConfiguration config)
+        private ILogger<GenerateTokenController> _logger;
+        public GenerateTokenController(IConfiguration config, ILogger<GenerateTokenController> logger)
         {
             passport = new Passport();
             _config = config;
+            _logger = logger;
         }
         [HttpGet]
-        public string AuthenticateUser(string userName, string passWord, string database)
+        public SecurityAccess AuthenticateUser(string userName, string passWord, string database)
         {
+            userName = userName == null ? string.Empty : userName;
+            passWord = passWord == null ? string.Empty : passWord;
+            database = database == null ? string.Empty : database;
             var m = new SecurityAccess(_config);
-
             var token = string.Empty;
             try
             {
@@ -38,7 +43,8 @@ namespace FusionWebApi.Controllers
             }
             catch (Exception ex)
             {
-                token = ex.Message;
+                CatchExceptions(m, ex);
+                _logger.LogError($"{ex.Message} Username: {userName} DatabaseName {database}");
             }
 
             var jw = new JwtService(m);
@@ -52,14 +58,35 @@ namespace FusionWebApi.Controllers
                 };
 
                 string Userprops = Encrypt.EncryptParameters(JsonConvert.SerializeObject(userdata));
-                token = jw.GenerateSecurityToken(Userprops);
+                m.Token = jw.GenerateSecurityToken(Userprops);
+
+                m.ErrorMessages.FusionCode = (int)EventCode.LoginSuccess;
+                m.ErrorMessages.FusionMessage = $"User {userName} successfully logged in to database: {database}!";
+                _logger.LogInformation($"User {userName} successfully logged in to database: {database}!");
             }
             else
             {
-                token = "Faild to authenticate, username or password are incorrect!";
+                m.ErrorMessages.FusionCode = (int)EventCode.LoginFail;
+                m.ErrorMessages.FusionMessage = "Faild to authenticate, username or password are incorrect!";
+                _logger.LogError($"Username: {userName} DatabaseName {database}");
             }
 
-            return token;
+            return m;
+        }
+        //written to prevent sensitive data exposure to the swagger UI Moti Mashiah.
+        private void CatchExceptions(SecurityAccess m, Exception ex)
+        {
+            if (ex.Message.Contains("nLogin failed for user 'sa'"))
+            {
+                m.ErrorMessages.Message = "";
+            }
+            else if (ex.Message.Contains("SLAuditLogins"))
+            {
+                m.ErrorMessages.Message = "";
+            }
+            m.ErrorMessages.Code = ex.HResult;
+            m.ErrorMessages.TimeStemp = DateTime.Now;
+            
         }
     }
 }
