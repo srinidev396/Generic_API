@@ -109,6 +109,9 @@ namespace FusionWebApi.Models
                         case "varchar":
                             userdata.PostColomn[counter].DataTypeFullName = "System.String";
                             break;
+                        case "nvarchar":
+                            userdata.PostColomn[counter].DataTypeFullName = "System.String";
+                            break;
                         case "text":
                             userdata.PostColomn[counter].DataTypeFullName = "System.String";
                             break;
