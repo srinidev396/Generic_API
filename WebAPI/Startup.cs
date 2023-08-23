@@ -15,6 +15,8 @@ using FusionWebApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using NLog.Extensions.Logging;
+using NLog;
 
 namespace FusionWebApi
 {
@@ -23,6 +25,7 @@ namespace FusionWebApi
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            LogManager.Configuration = new NLogLoggingConfiguration(configuration.GetSection("NLog"));
         }
 
         public IConfiguration Configuration { get; }
@@ -30,6 +33,12 @@ namespace FusionWebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddLogging(loggingBuilder =>
+            {
+                loggingBuilder.ClearProviders();
+                loggingBuilder.AddNLog();
+            });
+
             services.AddControllers();
             services.AddTokenAuthentication(Configuration);
             services.AddSwaggerGen(c =>

@@ -17,6 +17,8 @@ using System.Threading.Tasks;
 using System.Linq;
 using System.Diagnostics;
 using System.ComponentModel;
+using Microsoft.Extensions.Logging;
+using System.Reflection;
 
 namespace FusionWebApi.Controllers
 {
@@ -26,9 +28,11 @@ namespace FusionWebApi.Controllers
     public class DataController : ControllerBase
     {
         private IConfiguration _config;
-        public DataController(IConfiguration config)
+        private ILogger<DataController> _logger;
+        public DataController(IConfiguration config, ILogger<DataController> logger)
         {
             _config = config;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -47,7 +51,8 @@ namespace FusionWebApi.Controllers
                 model.ErrorMessages.Code = ex.HResult;
                 model.ErrorMessages.Message = ex.Message;
                 model.ErrorMessages.TimeStemp = DateTime.Now;
-                //LogErrorMessages.LogErrorMessage(ex, passport);
+                _logger.LogError($"{ex.Message} DataBaseName: {passport.DatabaseName} UserName: {passport.UserName}");
+                
             }
             return model;
         }
@@ -67,7 +72,7 @@ namespace FusionWebApi.Controllers
                 model.ErrorMessages.Code = ex.HResult;
                 model.ErrorMessages.Message = ex.Message;
                 model.ErrorMessages.TimeStemp = DateTime.Now;
-                //LogErrorMessages.LogErrorMessage(ex, passport);
+                _logger.LogError($"{ex.Message} DataBaseName: {passport.DatabaseName} UserName: {passport.UserName}");
             }
             return model;
         }
@@ -87,7 +92,7 @@ namespace FusionWebApi.Controllers
                 model.ErrorMessages.Code = ex.HResult;
                 model.ErrorMessages.Message = ex.Message;
                 model.ErrorMessages.TimeStemp = DateTime.Now;
-                // LogErrorMessages.LogErrorMessage(ex, passport);
+                _logger.LogError($"{ex.Message} DataBaseName: {passport.DatabaseName} UserName: {passport.UserName}");
             }
             return model;
         }
@@ -123,7 +128,7 @@ namespace FusionWebApi.Controllers
                 model.ErrorMessages.Code = ex.HResult;
                 model.ErrorMessages.Message = ex.Message;
                 model.ErrorMessages.TimeStemp = DateTime.Now;
-                //LogErrorMessages.LogErrorMessage(ex, passport);
+                _logger.LogError($"{ex.Message} DataBaseName: {passport.DatabaseName} UserName: {passport.UserName}");
             }
             //var rr = HttpContext.Connection.RemoteIpAddress.MapToIPv4();
             return model;
@@ -154,7 +159,7 @@ namespace FusionWebApi.Controllers
                 model.ErrorMessages.Code = ex.HResult;
                 model.ErrorMessages.Message = ex.Message;
                 model.ErrorMessages.TimeStemp = DateTime.Now;
-                //LogErrorMessages.LogErrorMessage(ex, passport);
+                _logger.LogError($"{ex.Message} DataBaseName: {passport.DatabaseName} UserName: {passport.UserName}");
             }
             //var rr = HttpContext.Connection.RemoteIpAddress.MapToIPv4();
             return model;
@@ -191,8 +196,8 @@ namespace FusionWebApi.Controllers
                 model.ErrorMessages.Code = ex.HResult;
                 model.ErrorMessages.Message = ex.Message;
                 model.ErrorMessages.TimeStemp = DateTime.Now;
-                LogErrorMessages.LogErrorMessage(ex, passport);
-                
+                _logger.LogError($"{ex.Message} DataBaseName: {passport.DatabaseName} UserName: {passport.UserName}");
+
             }
 
             return model;
@@ -221,7 +226,7 @@ namespace FusionWebApi.Controllers
                 model.ErrorMessages.Code = ex.HResult;
                 model.ErrorMessages.Message = ex.Message;
                 model.ErrorMessages.TimeStemp = DateTime.Now;
-                //LogErrorMessages.LogErrorMessage(ex, passport);
+                _logger.LogError($"{ex.Message} DataBaseName: {passport.DatabaseName} UserName: {passport.UserName}");
             }
             return model;
         }
@@ -257,8 +262,10 @@ namespace FusionWebApi.Controllers
             }
             catch (Exception ex)
             {
-                LogErrorMessages.LogErrorMessage(ex, passport);
-                model.FusionMessage = ex.Message;
+                model.ErrorMessages.Code = ex.HResult;
+                model.ErrorMessages.Message = ex.Message;
+                model.ErrorMessages.TimeStemp = DateTime.Now;
+                _logger.LogError($"{ex.Message} DataBaseName: {passport.DatabaseName} UserName: {passport.UserName}");
             }
             return model;
         }
@@ -266,6 +273,7 @@ namespace FusionWebApi.Controllers
         [Route("TestExceptionMethod")]
         public void TestExceptionMethod()
         {
+            var model = new ErrorMessages();
             var m = new SecurityAccess(_config);
             var passport = m.GetPassport(User.Identity.Name);
             try
@@ -275,7 +283,10 @@ namespace FusionWebApi.Controllers
             }
             catch (Exception ex)
             {
-                LogErrorMessages.LogErrorMessage(ex, passport);
+                model.Code = ex.HResult;
+                model.Message = ex.Message;
+                model.TimeStemp = DateTime.Now;
+                _logger.LogError($"{ex.Message} DataBaseName: {passport.DatabaseName} UserName: {passport.UserName}");
             }
         }
         [HttpGet]
@@ -300,6 +311,7 @@ namespace FusionWebApi.Controllers
                 getview.ErrorMessages.Code = ex.HResult;
                 getview.ErrorMessages.Message = ex.Message;
                 getview.ErrorMessages.TimeStemp = DateTime.Now;
+                _logger.LogError($"{ex.Message} DataBaseName: {passport.DatabaseName} UserName: {passport.UserName}");
             }
 
             return getview;

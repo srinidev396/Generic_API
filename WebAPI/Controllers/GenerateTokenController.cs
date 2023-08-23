@@ -10,7 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using FusionWebApi.Models;
 using Newtonsoft.Json.Linq;
-
+using Microsoft.Extensions.Logging;
 
 namespace FusionWebApi.Controllers
 {
@@ -20,6 +20,7 @@ namespace FusionWebApi.Controllers
     {
         private Passport passport;
         IConfiguration _config;
+        private ILogger<DataController> _logger;
         public GenerateTokenController(IConfiguration config)
         {
             passport = new Passport();
