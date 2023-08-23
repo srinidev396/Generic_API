@@ -189,13 +189,15 @@ namespace FusionWebApi.Models
                 param.PageIndex = pageNumber;
                 query.FillData(param);
                 v.TotalRowsQuery = TotalQueryRowCount(param.TotalRowsQuery, passport.Connection());
-                v.RowPerPage = param.Data.Rows.Count;
+                v.RowsPerPage = RowPerpage(passport, param.ViewId);
                 v.TableName = param.TableName;
                 v.ViewName = param.ViewName;
                 v.Viewid = param.ViewId;
                 v.PageNumber = pageNumber;
                 v.ListOfHeaders = BuildNewTableHeaderData(param);
                 v.ListOfDatarows = Buildrows(param);
+                decimal totpages = (decimal)v.TotalRowsQuery / v.RowsPerPage;
+                v.TotalPages = Math.Ceiling(totpages);
             }
             else
             {
@@ -203,6 +205,12 @@ namespace FusionWebApi.Models
             }
             
             return v;
+        }
+        private int RowPerpage(Passport pass, int viewid)
+        {
+            var conn = pass.Connection();
+            var cmd = new SqlCommand($"SELECT MaxRecsPerFetch FROM Views WHERE Id = {viewid}", conn);
+            return (int)cmd.ExecuteScalar();
         }
         private List<TableHeadersProperty> BuildNewTableHeaderData(Parameters param)
         {

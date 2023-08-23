@@ -41,9 +41,10 @@ namespace FusionWebApi.Models
         }
         public List<TableHeadersProperty> ListOfHeaders { get; set; }
         public List<List<string>> ListOfDatarows { get; set; }
+        public decimal TotalPages { get; set; }
         public ErrorMessages ErrorMessages { get; set; }
         public int TotalRowsQuery { get; set; }
-        public int RowPerPage { get; set; }
+        public int RowsPerPage { get; set; }
         public int Viewid { get; set; }
         public string TableName { get; set; }
         public string ViewName { get; set; }
@@ -120,6 +121,7 @@ namespace FusionWebApi.Models
         None = 0,
         LoginFail = -1,
         LoginSuccess = 1,
+        WrongValue = 2,
 
     }
 

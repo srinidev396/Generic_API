@@ -292,24 +292,39 @@ namespace FusionWebApi.Controllers
         [HttpGet]
         [Route("GetViewData")]
         public async Task<Viewmodel> GetViewData(int viewid, int pageNumber)
-        {
-            
+        {   
             var getview = new Viewmodel();
             var m = new SecurityAccess(_config);
             var passport = m.GetPassport(User.Identity.Name);
             var v = new RecordsActions(passport);
             try
             {
-                if (viewid > 0)
+                if (viewid == 0 || pageNumber == 0)
+                {
+                    getview.ErrorMessages.FusionCode = (int)EventCode.WrongValue;
+                    getview.ErrorMessages.FusionMessage = $"Viewid or pageNumber cannot be 0";
+                }
+                else 
                 {
                     getview = await Task.Run(() => v.GetviewData(viewid, pageNumber));
+                    if(pageNumber > getview.TotalPages)
+                    {
+                        getview.ErrorMessages.FusionCode = (int)EventCode.WrongValue;
+                        getview.ErrorMessages.FusionMessage = $"My friend Jerald Total page is {getview.TotalPages} and you entered {pageNumber} so please stop breaking my code :) :) :)";
+                    }
                 }
             }
          
             catch (Exception ex)
             {
-                getview.ErrorMessages.Code = ex.HResult;
-                getview.ErrorMessages.Message = ex.Message;
+                if(ex.Message.Contains("position 0"))
+                {
+                    getview.ErrorMessages.Code = 0;
+                    getview.ErrorMessages.Message = "";
+                    getview.ErrorMessages.FusionCode = (int)EventCode.WrongValue;
+                    getview.ErrorMessages.FusionMessage = $"View {viewid} is not found";
+                }
+                
                 getview.ErrorMessages.TimeStemp = DateTime.Now;
                 _logger.LogError($"{ex.Message} DataBaseName: {passport.DatabaseName} UserName: {passport.UserName}");
             }
