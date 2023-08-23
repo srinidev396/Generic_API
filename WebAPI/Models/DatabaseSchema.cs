@@ -82,14 +82,14 @@ namespace FusionWebApi.Models
 
                 foreach (DataRow item in table.Rows)
                 {
-                    var tableName = item.Field<string>("TABLE_NAME");
+                    var tableName = item.Field<string>("TABLE_NAME").Trim();
                     var columnName = item.Field<string>("COLUMN_NAME");
                     var datatype = item.Field<string>("DATA_TYPE");
                     var isnullAble = item.Field<string>("IS_NULLABLE");
                     tc.ListOfColumns.Add(new Columns { ColumnName = columnName, DataType = datatype, IsNullable = isnullAble });
 
                 }
-                tc.TableName = TableName;
+                tc.TableName = TableName.Trim();
                 tc.ColumsCount = tc.ListOfColumns.Count;
             }
             return tc;
@@ -99,7 +99,7 @@ namespace FusionWebApi.Models
         {
             var schema = DatabaseSchema.GetTableSchema(userdata.TableName, passport).ListOfColumns;
             var counter = 0;
-            foreach (PostColumns c in userdata.PostColomn)
+            foreach (PostColumns c in userdata.PostRow)
             {
                 var col = schema.Where(a => a.ColumnName == c.ColumnName);
                 if (col.Count() > 0)
@@ -107,28 +107,28 @@ namespace FusionWebApi.Models
                     switch (col.FirstOrDefault().DataType)
                     {
                         case "varchar":
-                            userdata.PostColomn[counter].DataTypeFullName = "System.String";
+                            userdata.PostRow[counter].DataTypeFullName = "System.String";
                             break;
                         case "nvarchar":
-                            userdata.PostColomn[counter].DataTypeFullName = "System.String";
+                            userdata.PostRow[counter].DataTypeFullName = "System.String";
                             break;
                         case "text":
-                            userdata.PostColomn[counter].DataTypeFullName = "System.String";
+                            userdata.PostRow[counter].DataTypeFullName = "System.String";
                             break;
                         case "smallint":
-                            userdata.PostColomn[counter].DataTypeFullName = "System.Int16";
+                            userdata.PostRow[counter].DataTypeFullName = "System.Int16";
                             break;
                         case "int":
-                            userdata.PostColomn[counter].DataTypeFullName = "System.Int32";
+                            userdata.PostRow[counter].DataTypeFullName = "System.Int32";
                             break;
                         case "float":
-                            userdata.PostColomn[counter].DataTypeFullName = " System.Double";
+                            userdata.PostRow[counter].DataTypeFullName = " System.Double";
                             break;
                         case "datetime":
-                            userdata.PostColomn[counter].DataTypeFullName = "System.DateTime";
+                            userdata.PostRow[counter].DataTypeFullName = "System.DateTime";
                             break;
                         case "bit":
-                            userdata.PostColomn[counter].DataTypeFullName = "System.boolean";
+                            userdata.PostRow[counter].DataTypeFullName = "System.boolean";
                             break;
                         default:
                             break;
@@ -142,35 +142,35 @@ namespace FusionWebApi.Models
         {
             var schema = DatabaseSchema.GetTableSchema(userdata.TableName, passport).ListOfColumns;
             var counter = 0;
-            for (int i = 0; i < userdata.PostColumnsMulti.Count; i++)
+            for (int i = 0; i < userdata.PostMultiRows.Count; i++)
             {
-                for (int j = 0; j < userdata.PostColumnsMulti[i].Count; j++)
+                for (int j = 0; j < userdata.PostMultiRows[i].Count; j++)
                 {
-                    var col = schema.Where(a => a.ColumnName == userdata.PostColumnsMulti[i][j].ColumnName);
+                    var col = schema.Where(a => a.ColumnName == userdata.PostMultiRows[i][j].ColumnName);
                     if (col.Count() > 0)
                     {
                         switch (col.FirstOrDefault().DataType)
                         {
                             case "varchar":
-                                userdata.PostColumnsMulti[i][j].DataTypeFullName = "System.String";
+                                userdata.PostMultiRows[i][j].DataTypeFullName = "System.String";
                                 break;
                             case "text":
-                                userdata.PostColumnsMulti[i][j].DataTypeFullName = "System.String";
+                                userdata.PostMultiRows[i][j].DataTypeFullName = "System.String";
                                 break;
                             case "smallint":
-                                userdata.PostColumnsMulti[i][j].DataTypeFullName = "System.Int16";
+                                userdata.PostMultiRows[i][j].DataTypeFullName = "System.Int16";
                                 break;
                             case "int":
-                                userdata.PostColumnsMulti[i][j].DataTypeFullName = "System.Int32";
+                                userdata.PostMultiRows[i][j].DataTypeFullName = "System.Int32";
                                 break;
                             case "float":
-                                userdata.PostColumnsMulti[i][j].DataTypeFullName = " System.Double";
+                                userdata.PostMultiRows[i][j].DataTypeFullName = " System.Double";
                                 break;
                             case "datetime":
-                                userdata.PostColumnsMulti[i][j].DataTypeFullName = "System.DateTime";
+                                userdata.PostMultiRows[i][j].DataTypeFullName = "System.DateTime";
                                 break;
                             case "bit":
-                                userdata.PostColumnsMulti[i][j].DataTypeFullName = "System.boolean";
+                                userdata.PostMultiRows[i][j].DataTypeFullName = "System.boolean";
                                 break;
                             default:
                                 break;

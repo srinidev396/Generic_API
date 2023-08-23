@@ -96,7 +96,7 @@ namespace FusionWebApi.Controllers
         public async Task<Records> NewRecord(UIPostModel userdata)
         {
             var model = new Records();
-            if (userdata.PostColomn.Count == 0)
+            if (userdata.PostRow.Count == 0)
             {
                 model.FusionMessage = "No column to post";
                 return model;
@@ -136,7 +136,7 @@ namespace FusionWebApi.Controllers
         public async Task<Records> NewRecordMulti(UIPostModel userdata)
         {
             var model = new Records();
-            if (userdata.PostColumnsMulti.Count == 0)
+            if (userdata.PostMultiRows.Count == 0)
             {
                 model.FusionMessage = "No rows to post";
                 return model;
@@ -165,7 +165,7 @@ namespace FusionWebApi.Controllers
         {
 
             var model = new Records();
-            if (userdata.PostColomn.Count == 0)
+            if (userdata.PostRow.Count == 0)
             {
                 model.FusionMessage = "No column to post";
                 return model;
@@ -202,7 +202,7 @@ namespace FusionWebApi.Controllers
         public async Task<Records> EditRecordByColumn(UIPostModel userdata)
         {
             var model = new Records();
-            if (userdata.PostColomn.Count == 0)
+            if (userdata.PostRow.Count == 0)
             {
                 model.FusionMessage  = "No column to post";
                 return model;
@@ -230,7 +230,7 @@ namespace FusionWebApi.Controllers
         public async Task<Records> EditIfNotExistAdd(UIPostModel userdata)
         {
             var model = new Records();
-            if (userdata.PostColomn.Count == 0)
+            if (userdata.PostRow.Count == 0)
             {
                 model.FusionMessage = "No column to post";
                 return model;

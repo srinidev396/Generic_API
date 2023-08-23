@@ -31,13 +31,13 @@ namespace FusionWebApi.Models
                 param.NewRecord = true;
                 //var col = PostData.PostColomn[0];
                 // Columns = PostData.PostColomn;
-                param.AfterData = GetAfterData(PostData.PostColomn);
+                param.AfterData = GetAfterData(PostData.PostRow);
                 //param.RequestedRows = 1;
 
                 //param.Culture = Keys.GetCultureCookies(_httpContext);
                 ScriptReturn result = null;
 
-                Query.Save(param, "", param.KeyField, "", DataFieldValues(PostData.PostColomn), passport, result);
+                Query.Save(param, "", param.KeyField, "", DataFieldValues(PostData.PostRow), passport, result);
 
                 var withBlock = AuditType.WebAccess;
                 withBlock.TableName = param.TableName;
@@ -59,7 +59,7 @@ namespace FusionWebApi.Models
         }
         public string AddNewRowMulti(UIPostModel PostData)
         {
-            return Query.AddNewMultiRecords(passport, PostData.TableName, DataFieldValuesMulti(PostData.PostColumnsMulti)); 
+            return Query.AddNewMultiRecords(passport, PostData.TableName, DataFieldValuesMulti(PostData.PostMultiRows)); 
         }
         public bool EditRow(UIPostModel EditData)
         {
@@ -72,13 +72,13 @@ namespace FusionWebApi.Models
                 param.NewRecord = false;
                 param.BeforeData = "";
                 // Columns = EditData.PostColomn;
-                param.AfterData = GetAfterData(EditData.PostColomn);
+                param.AfterData = GetAfterData(EditData.PostRow);
                 //param.Culture = Keys.GetCultureCookies(_httpContext);
 
                 // linkscript before
                 ScriptReturn result = null;
                 // save row
-                Query.Save(param, "", param.KeyField, param.KeyValue, DataFieldValues(EditData.PostColomn), passport, result);
+                Query.Save(param, "", param.KeyField, param.KeyValue, DataFieldValues(EditData.PostRow), passport, result);
 
                 //save audit
                 {
@@ -103,7 +103,7 @@ namespace FusionWebApi.Models
         }
         public string EditRecordByColumn(UIPostModel Ed)
         {
-            var data = DataFieldValues(Ed.PostColomn);
+            var data = DataFieldValues(Ed.PostRow);
             return Query.UpdateRecordsByColumn(Ed.keyValue, Ed.FieldName, Ed.TableName, passport, data, Ed.IsMultyupdate);
         }
         private List<FieldValue> DataFieldValues(List<PostColumns> ListOfcolumns)
