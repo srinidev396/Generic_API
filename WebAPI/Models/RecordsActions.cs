@@ -208,7 +208,6 @@ namespace FusionWebApi.Models
         {
             int columnOrder = 0;
             var ListOfHeaders = new List<TableHeadersProperty>();
-            ListOfHeaders.Add(new TableHeadersProperty("pkey", "False", "none", "False", "False", columnOrder, "", false, "", "", false, 0, false));
             foreach (DataColumn col in param.Data.Columns)
             {
                 if (ShowColumn(col, 0, param.ParentField))
@@ -262,8 +261,6 @@ namespace FusionWebApi.Models
             {
                 // 'get the pkey
                 string dataColumn = "";
-                dataColumn = dr["pkey"].ToString();
-                ListOfColumn.Add(dataColumn);
                 foreach (DataColumn col in param.Data.Columns)
                 {
                     // If Not dr(col.ColumnName).GetType.ToString.ToLower = "system.boolean" And Not dr(col.ColumnName).GetType.ToString.ToLower = "system.datetime" Then
