@@ -154,6 +154,9 @@ namespace FusionWebApi.Models
                             case "varchar":
                                 userdata.PostMultiRows[i][j].DataTypeFullName = "System.String";
                                 break;
+                            case "nvarchar":
+                                userdata.PostRow[counter].DataTypeFullName = "System.String";
+                                break;
                             case "text":
                                 userdata.PostMultiRows[i][j].DataTypeFullName = "System.String";
                                 break;
