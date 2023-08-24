@@ -122,6 +122,12 @@ namespace FusionWebApi.Models
         LoginFail = -1,
         LoginSuccess = 1,
         WrongValue = 2,
+        NewRecordAdded = 3,
+        NewRecordsAdded = 4,
+        NoColumn = 5,
+        NoRow = 6,
+        RecordUpdated = 7,
+        insufficientpermissions = 8,
 
     }
 

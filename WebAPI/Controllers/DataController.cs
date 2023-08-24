@@ -103,7 +103,8 @@ namespace FusionWebApi.Controllers
             var model = new Records();
             if (userdata.PostRow.Count == 0)
             {
-                model.FusionMessage = "No column to post";
+                model.ErrorMessages.FusionCode = (int)EventCode.NoColumn;
+                model.ErrorMessages.FusionMessage = "No column to post";
                 return model;
             } 
             var m = new SecurityAccess(_config);
@@ -114,7 +115,8 @@ namespace FusionWebApi.Controllers
                 var addrecord = new RecordsActions(passport);
                 if (await Task.Run(() => addrecord.AddNewRow(userdata)))
                 {
-                    model.FusionMessage = $"New Record Added!";
+                    model.ErrorMessages.FusionCode = (int)EventCode.NewRecordAdded;
+                    model.ErrorMessages.FusionMessage = $"New Record Added!";
                     return model; 
                 }
                 else
@@ -143,7 +145,8 @@ namespace FusionWebApi.Controllers
             var model = new Records();
             if (userdata.PostMultiRows.Count == 0)
             {
-                model.FusionMessage = "No rows to post";
+                model.ErrorMessages.FusionCode = (int)EventCode.NoRow;
+                model.ErrorMessages.FusionMessage = "No rows to post";
                 return model;
             }
             var m = new SecurityAccess(_config);
@@ -152,7 +155,9 @@ namespace FusionWebApi.Controllers
             {
                 await Task.Run(() => DatabaseSchema.GetColumntypeMulti(passport, userdata));
                 var addrecord = new RecordsActions(passport);
-                model.FusionMessage = await Task.Run(() => addrecord.AddNewRowMulti(userdata));
+                model.ErrorMessages.FusionMessage = await Task.Run(() => addrecord.AddNewRowMulti(userdata));
+                model.ErrorMessages.FusionCode = (int)EventCode.NewRecordsAdded;
+                
             }
             catch (Exception ex)
             {
@@ -172,7 +177,8 @@ namespace FusionWebApi.Controllers
             var model = new Records();
             if (userdata.PostRow.Count == 0)
             {
-                model.FusionMessage = "No column to post";
+                model.ErrorMessages.FusionCode = (int)EventCode.NoColumn;
+                model.ErrorMessages.FusionMessage = "No column to post";
                 return model;
             } 
             var m = new SecurityAccess(_config);
@@ -183,11 +189,13 @@ namespace FusionWebApi.Controllers
                 var editrecord = new RecordsActions(passport);
                 if (await Task.Run(() => editrecord.EditRow(userdata)))
                 {
-                    model.FusionMessage = $"Record Updated!";
+                    model.ErrorMessages.FusionCode = (int)(EventCode.RecordUpdated);
+                    model.ErrorMessages.FusionMessage = $"Record Updated!";
                 }
                 else
                 {
-                    model.FusionMessage = $"insufficient permissions to Edit";
+                    model.ErrorMessages.FusionCode = (int)EventCode.insufficientpermissions;
+                    model.ErrorMessages.FusionMessage = $"insufficient permissions to Edit";
                 }
 
             }
@@ -209,7 +217,8 @@ namespace FusionWebApi.Controllers
             var model = new Records();
             if (userdata.PostRow.Count == 0)
             {
-                model.FusionMessage  = "No column to post";
+                model.ErrorMessages.FusionCode = (int)EventCode.NoColumn;
+                model.ErrorMessages.FusionMessage  = "No column to post";
                 return model;
             }
                 
@@ -219,7 +228,8 @@ namespace FusionWebApi.Controllers
             {
                 await Task.Run(() => DatabaseSchema.GetColumntype(passport, userdata));
                 var editrecord = new RecordsActions(passport);
-                model.FusionMessage = await Task.Run(() => editrecord.EditRecordByColumn(userdata));
+                model.ErrorMessages.FusionCode = (int)EventCode.RecordUpdated;
+                model.ErrorMessages.FusionMessage = await Task.Run(() => editrecord.EditRecordByColumn(userdata));
             }
             catch (Exception ex)
             {
@@ -237,7 +247,8 @@ namespace FusionWebApi.Controllers
             var model = new Records();
             if (userdata.PostRow.Count == 0)
             {
-                model.FusionMessage = "No column to post";
+                model.ErrorMessages.FusionCode = (int)EventCode.NoColumn;
+                model.ErrorMessages.FusionMessage = "No column to post";
                 return model;
             }
                 
@@ -252,11 +263,13 @@ namespace FusionWebApi.Controllers
                 {
                     if (await Task.Run(() => record.AddNewRow(userdata)))
                     {
-                        model.FusionMessage = $"New Record Added!";
+                        model.ErrorMessages.FusionCode = (int)EventCode.NewRecordAdded;
+                        model.ErrorMessages.FusionMessage = $"New Record Added!";
                     }
                     else
                     {
-                        model.FusionMessage = $"Insufficient permissions to Add";
+                        model.ErrorMessages.FusionCode = (int)EventCode.insufficientpermissions;
+                        model.ErrorMessages.FusionMessage = $"Insufficient permissions to Add";
                     }
                 }
             }
