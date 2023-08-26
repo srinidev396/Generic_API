@@ -7,6 +7,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using static FusionWebApi.Models.DatabaseSchema;
+using System.Reflection;
 
 namespace FusionWebApi.Controllers
 {
@@ -28,6 +29,7 @@ namespace FusionWebApi.Controllers
         public async Task<UserViews> GetUserViews()
         {
             var model = new UserViews();
+            model.ErrorMessages.TimeStemp = DateTime.Now;
             var m = new SecurityAccess(_config);
             var passport = m.GetPassport(User.Identity.Name);
             try
@@ -40,7 +42,7 @@ namespace FusionWebApi.Controllers
                 model.ErrorMessages.Message = ex.Message;
                 model.ErrorMessages.TimeStemp = DateTime.Now;
                 _logger.LogError($"{ex.Message} DataBaseName: {passport.DatabaseName} UserName: {passport.UserName}");
-                
+
             }
             return model;
         }
@@ -49,6 +51,7 @@ namespace FusionWebApi.Controllers
         public async Task<SchemaModel> GetDbSchema()
         {
             var model = new SchemaModel();
+            model.ErrorMessages.TimeStemp = DateTime.Now;
             var m = new SecurityAccess(_config);
             var passport = m.GetPassport(User.Identity.Name);
             try
@@ -69,6 +72,7 @@ namespace FusionWebApi.Controllers
         public async Task<TablesSchema> GetTableSchema(string TableName)
         {
             TablesSchema model = new TablesSchema();
+            model.ErrorMessages.TimeStemp = DateTime.Now;
             var m = new SecurityAccess(_config);
             var passport = m.GetPassport(User.Identity.Name);
             try
@@ -89,12 +93,13 @@ namespace FusionWebApi.Controllers
         public async Task<Records> NewRecord(UIPostModel userdata)
         {
             var model = new Records();
+            model.ErrorMessages.TimeStemp = DateTime.Now;
             if (userdata.PostRow.Count == 0)
             {
                 model.ErrorMessages.FusionCode = (int)EventCode.NoColumn;
                 model.ErrorMessages.FusionMessage = "No column to post";
                 return model;
-            } 
+            }
             var m = new SecurityAccess(_config);
             var passport = m.GetPassport(User.Identity.Name);
             try
@@ -105,7 +110,7 @@ namespace FusionWebApi.Controllers
                 {
                     model.ErrorMessages.FusionCode = (int)EventCode.NewRecordAdded;
                     model.ErrorMessages.FusionMessage = $"New Record Added!";
-                    return model; 
+                    return model;
                 }
                 else
                 {
@@ -131,6 +136,7 @@ namespace FusionWebApi.Controllers
         public async Task<Records> NewRecordMulti(UIPostModel userdata)
         {
             var model = new Records();
+            model.ErrorMessages.TimeStemp = DateTime.Now;
             if (userdata.PostMultiRows.Count == 0)
             {
                 model.ErrorMessages.FusionCode = (int)EventCode.NoRow;
@@ -145,7 +151,7 @@ namespace FusionWebApi.Controllers
                 var addrecord = new RecordsActions(passport);
                 model.ErrorMessages.FusionMessage = await Task.Run(() => addrecord.AddNewRowMulti(userdata));
                 model.ErrorMessages.FusionCode = (int)EventCode.NewRecordsAdded;
-                
+
             }
             catch (Exception ex)
             {
@@ -163,12 +169,13 @@ namespace FusionWebApi.Controllers
         {
 
             var model = new Records();
+            model.ErrorMessages.TimeStemp = DateTime.Now;
             if (userdata.PostRow.Count == 0)
             {
                 model.ErrorMessages.FusionCode = (int)EventCode.NoColumn;
                 model.ErrorMessages.FusionMessage = "No column to post";
                 return model;
-            } 
+            }
             var m = new SecurityAccess(_config);
             var passport = m.GetPassport(User.Identity.Name);
             try
@@ -203,13 +210,14 @@ namespace FusionWebApi.Controllers
         public async Task<Records> EditRecordByColumn(UIPostModel userdata)
         {
             var model = new Records();
+            model.ErrorMessages.TimeStemp = DateTime.Now;
             if (userdata.PostRow.Count == 0)
             {
                 model.ErrorMessages.FusionCode = (int)EventCode.NoColumn;
-                model.ErrorMessages.FusionMessage  = "No column to post";
+                model.ErrorMessages.FusionMessage = "No column to post";
                 return model;
             }
-                
+
             var m = new SecurityAccess(_config);
             var passport = m.GetPassport(User.Identity.Name);
             try
@@ -233,13 +241,14 @@ namespace FusionWebApi.Controllers
         public async Task<Records> EditIfNotExistAdd(UIPostModel userdata)
         {
             var model = new Records();
+            model.ErrorMessages.TimeStemp = DateTime.Now;
             if (userdata.PostRow.Count == 0)
             {
                 model.ErrorMessages.FusionCode = (int)EventCode.NoColumn;
                 model.ErrorMessages.FusionMessage = "No column to post";
                 return model;
             }
-                
+
             var m = new SecurityAccess(_config);
             var passport = m.GetPassport(User.Identity.Name);
             try
@@ -293,8 +302,9 @@ namespace FusionWebApi.Controllers
         [HttpGet]
         [Route("GetViewData")]
         public async Task<Viewmodel> GetViewData(int viewid, int pageNumber)
-        {   
+        {
             var getview = new Viewmodel();
+            getview.ErrorMessages.TimeStemp = DateTime.Now;
             var m = new SecurityAccess(_config);
             var passport = m.GetPassport(User.Identity.Name);
             var v = new RecordsActions(passport);
@@ -305,27 +315,27 @@ namespace FusionWebApi.Controllers
                     getview.ErrorMessages.FusionCode = (int)EventCode.WrongValue;
                     getview.ErrorMessages.FusionMessage = $"Viewid or pageNumber cannot be 0";
                 }
-                else 
+                else
                 {
                     getview = await Task.Run(() => v.GetviewData(viewid, pageNumber));
-                    if(pageNumber > getview.TotalPages)
+                    if (pageNumber > getview.TotalPages)
                     {
                         getview.ErrorMessages.FusionCode = (int)EventCode.WrongValue;
                         getview.ErrorMessages.FusionMessage = $"My friend Jerald Total page is {getview.TotalPages} and you entered {pageNumber} so please stop breaking my code :) :) :)";
                     }
                 }
             }
-         
+
             catch (Exception ex)
             {
-                if(ex.Message.Contains("position 0"))
+                if (ex.Message.Contains("position 0"))
                 {
                     getview.ErrorMessages.Code = 0;
                     getview.ErrorMessages.Message = "";
                     getview.ErrorMessages.FusionCode = (int)EventCode.WrongValue;
                     getview.ErrorMessages.FusionMessage = $"View {viewid} is not found";
                 }
-                
+
                 getview.ErrorMessages.TimeStemp = DateTime.Now;
                 _logger.LogError($"{ex.Message} DataBaseName: {passport.DatabaseName} UserName: {passport.UserName}");
             }
