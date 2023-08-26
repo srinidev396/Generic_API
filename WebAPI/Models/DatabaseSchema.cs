@@ -6,19 +6,24 @@ using System;
 using System.Linq;
 using System.Diagnostics;
 using Microsoft.Extensions.Hosting;
+using System.Runtime.Versioning;
+using FusionWebApi.Properties;
+using Newtonsoft.Json;
 
 namespace FusionWebApi.Models
 {
     public class DatabaseSchema
     {
-        public static List<GetDbSchema> ReturnDbSchema(Passport passport)
+        public static SchemaModel ReturnDbSchema(Passport passport)
         {
-            var tablescm = new DataTable();
-            TablesSchema tc = new TablesSchema();
+            var model = new SchemaModel();
+            int tableCounter = 0;
             var skl = new List<GetDbSchema>();
+            
             using (SqlConnection conn = new SqlConnection(passport.ConnectionString))
             {
                 using SqlCommand cmd = new SqlCommand("", conn);
+
                 if (!(conn.State == ConnectionState.Open))
                 {
                     conn.Open();
@@ -26,51 +31,64 @@ namespace FusionWebApi.Models
 
                 var ListOfColumn = new List<List<Columns>>();
                 var lst = new List<Columns>();
-                var TempTableName = string.Empty;
                 foreach (DataRow item in DatabaseSchema.GetCustomerTablesSchema(cmd).Rows)
                 {
-                    var tableName = item.Field<string>("TABLE_NAME");
+                    var tableName = item.Field<string>("tableName");
+                    var sqlcmd = new SqlCommand(Resources.GetSchema, conn);
+                    var tablescm = new DataTable();
                     if (passport.CheckPermission(tableName, SecureObject.SecureObjectType.Table, Permissions.Permission.View))
                     {
-                        var columnName = item.Field<string>("COLUMN_NAME");
-                        var datatype = item.Field<string>("DATA_TYPE");
-                        var isnullAble = item.Field<string>("IS_NULLABLE");
-
-                        if (TempTableName != tableName && TempTableName != String.Empty)
+                        sqlcmd.Parameters.AddWithValue("@tablename", tableName);
+                        using (SqlDataAdapter da = new SqlDataAdapter(sqlcmd))
                         {
-                            ListOfColumn.Add(lst); 
-                            skl.Add(new GetDbSchema { TableName = TempTableName, ColumnCount = lst.Count, ListOfColumns = lst });
-                            lst = new List<Columns>();
-
-                            lst.Add(new Columns { ColumnName = columnName, DataType = datatype, IsNullable = isnullAble });
+                            da.Fill(tablescm);
                         }
-                        else
+                        foreach (DataRow s in tablescm.Rows)
                         {
-                            lst.Add(new Columns { ColumnName = columnName, DataType = datatype, IsNullable = isnullAble });
-                        }
+                            var columnName = s.Field<string>("COLUMN_NAME");
+                            var datatype = s.Field<string>("DATA_TYPE");
+                            var maxlength = s.Field<object>("CHARACTER_MAXIMUM_LENGTH");
+                            int? maxLengthNullable = (maxlength is DBNull) ? null : (int?)Convert.ToInt32(maxlength);
+                            var isnullAble = s.Field<string>("IS_NULLABLE");
+                            var isprimarykey = s.Field<string>("IS_PRIMARY_KEY");
+                            var isautoincrement = s.Field<string>("IS_AUTO_INCREMENT");
+                            var primarykeytype = s.Field<string>("PRIMARY_KEY_TYPE");
+                            lst.Add(new Columns
+                            {
+                                ColumnName = columnName,
+                                DataType = datatype,
+                                MaxLength = maxLengthNullable,
+                                IsNullable = isnullAble,
+                                IsPrimaryKey = isprimarykey,
+                                IsAutoIncrement = isautoincrement,
+                                PrimaryKeyType = primarykeytype
 
-                        TempTableName = tableName;
+                            });
+                        }
+                        model.getDbSchemas.Add(new GetDbSchema { TableName = tableName, ColumnCount = lst.Count, ListOfColumns = lst });
+                        tableCounter++;
+                        lst = new List<Columns>();
                     }
                 }
                 conn.Close();
-                skl.Add(new GetDbSchema { TableName = TempTableName, ColumnCount = lst.Count, ListOfColumns = lst });
             }
-            skl.OrderBy(a => a.TableName);
-            return skl;
+            model.TotalSchemaTables = tableCounter;
+            model.getDbSchemas.OrderBy(a => a.TableName);
+            return model;
         }
         public static TablesSchema GetTableSchema(string TableName, Passport passport)
         {
 
             TablesSchema tc = new TablesSchema();
             var table = new DataTable();
-            var sqlstring = $"select a.TABLE_NAME, a.COLUMN_NAME, a.DATA_TYPE, a.IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS a WHERE a.TABLE_NAME = @tablename";
+            // var sqlstring = $"select a.TABLE_NAME, a.COLUMN_NAME, a.DATA_TYPE, a.IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS a WHERE a.TABLE_NAME = @tablename";
             if (passport.CheckPermission(TableName, SecureObject.SecureObjectType.Table, Permissions.Permission.View))
             {
                 using (SqlConnection conn = new SqlConnection(passport.ConnectionString))
                 {
-                    using (SqlCommand cmd = new SqlCommand(sqlstring, conn))
+                    using (SqlCommand cmd = new SqlCommand(Resources.GetSchema, conn))
                     {
-                        cmd.CommandText = sqlstring;
+                        //cmd.CommandText = sqlstring;
                         cmd.Parameters.AddWithValue("@tablename", TableName);
                         using (SqlDataAdapter da = new SqlDataAdapter(cmd))
                         {
@@ -85,8 +103,24 @@ namespace FusionWebApi.Models
                     var tableName = item.Field<string>("TABLE_NAME").Trim();
                     var columnName = item.Field<string>("COLUMN_NAME");
                     var datatype = item.Field<string>("DATA_TYPE");
+                    var maxlength = item.Field<object>("CHARACTER_MAXIMUM_LENGTH");
+                    int? maxLengthNullable = (maxlength is DBNull) ? null : (int?)Convert.ToInt32(maxlength);
                     var isnullAble = item.Field<string>("IS_NULLABLE");
-                    tc.ListOfColumns.Add(new Columns { ColumnName = columnName, DataType = datatype, IsNullable = isnullAble });
+                    var isprimarykey = item.Field<string>("IS_PRIMARY_KEY");
+                    var isautoincrement = item.Field<string>("IS_AUTO_INCREMENT");
+                    var primarykeytype = item.Field<string>("PRIMARY_KEY_TYPE");
+
+
+                    tc.ListOfColumns.Add(new Columns
+                    {
+                        ColumnName = columnName,
+                        DataType = datatype,
+                        MaxLength = maxLengthNullable,
+                        IsNullable = isnullAble,
+                        IsPrimaryKey = isprimarykey,
+                        IsAutoIncrement = isautoincrement,
+                        PrimaryKeyType = primarykeytype
+                    });
 
                 }
                 tc.TableName = TableName.Trim();
@@ -187,80 +221,66 @@ namespace FusionWebApi.Models
         {
             var table = new DataTable();
             DataTable tablescm = new DataTable();
-            cmd.CommandText = "select tableName from tables order by TableName";
+            cmd.CommandText = "SELECT tableName FROM tables ORDER BY TableName";
             using (SqlDataAdapter da = new SqlDataAdapter(cmd))
             {
                 da.Fill(table);
             }
-            string paramss = string.Empty;
-            var counter = 0;
-            foreach (DataRow item in table.Rows)
+            return table;
+        }
+
+        public class TablesSchema
+        {
+            public TablesSchema()
             {
-                counter++;
-                var tablename = item.Field<string>("tableName");
-                if (counter == table.Rows.Count)
-                {
-                    paramss += $"TABLE_NAME = @{tablename}";
-                }
-                else
-                {
-                    paramss += $"TABLE_NAME = @{tablename} or ";
-                }
-                cmd.Parameters.AddWithValue($"@{tablename}", tablename);
-
-            }
-
-            var sqlstring = $"select a.TABLE_NAME, a.COLUMN_NAME, a.DATA_TYPE, a.IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS a WHERE {paramss}";
-            cmd.CommandText = sqlstring;
-            using (SqlDataAdapter da = new SqlDataAdapter(cmd))
-            {
-                da.Fill(tablescm);
-            }
-
-            return tablescm;
-        }
-    }
-
-    public class TablesSchema
-    {
-        public TablesSchema()
-        {
-            ListOfColumns = new List<Columns>();
-            ErrorMessages = new ErrorMessages();
-            //ListOfColumn = new List<List<Columns>>();
-        }
-        public string TableName { get; set; }
-        public int ColumsCount { get; set; }
-        public List<Columns> ListOfColumns { get; set; }
-        public ErrorMessages ErrorMessages { get; set; }
-    }
-    public class Columns
-    {
-        public string ColumnName { get; set; }
-        public string DataType { get; set; }
-        public string IsNullable { get; set; }
-
-    }
-
-    public class GetDbSchema
-    {
-        public GetDbSchema()
-        {
-            ListOfColumns = new List<Columns>();
-        }
-        public List<Columns> ListOfColumns { get; set; }
-        public string TableName { get; set; }
-        public int ColumnCount { get; set; }
-    }
-
-    public class SchemaModel
-    {
-        public SchemaModel()
-        {
+                ListOfColumns = new List<Columns>();
                 ErrorMessages = new ErrorMessages();
+                //ListOfColumn = new List<List<Columns>>();
+            }
+            public string TableName { get; set; }
+            public int ColumsCount { get; set; }
+            public List<Columns> ListOfColumns { get; set; }
+            public ErrorMessages ErrorMessages { get; set; }
         }
-        public List<GetDbSchema> getDbSchemas { get; set; }
-        public ErrorMessages ErrorMessages { get; set; } 
-    }
+        public class Columns
+        {
+            public string ColumnName { get; set; }
+            public string DataType { get; set; }
+            public object MaxLength { get; set; }
+            public string IsNullable { get; set; }
+            public string IsPrimaryKey { get; set; }
+            public string IsAutoIncrement { get; set; }
+            public string PrimaryKeyType { get; set; }
 
+        }
+
+        public class GetDbSchema
+        {
+            public GetDbSchema()
+            {
+                ListOfColumns = new List<Columns>();
+            }
+            [JsonProperty(Order = 1)]
+            public string TableName { get; set; }
+            [JsonProperty(Order = 2)]
+            public int ColumnCount { get; set; }
+            [JsonProperty(Order = 3)]
+            public List<Columns> ListOfColumns { get; set; }
+        }
+
+        public class SchemaModel
+        {
+            public SchemaModel()
+            {
+                ErrorMessages = new ErrorMessages();
+                getDbSchemas = new List<GetDbSchema>();
+            }
+
+            [JsonProperty(Order = 1)]
+            public int TotalSchemaTables { get; set; }
+            public List<GetDbSchema> getDbSchemas { get; set; }
+            public ErrorMessages ErrorMessages { get; set; }
+        }
+
+    }
 }

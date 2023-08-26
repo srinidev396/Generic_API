@@ -1,24 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Smead.Security;
-using System.Data.SqlClient;
-using System.Net.Http;
 using FusionWebApi.Models;
-using Newtonsoft.Json;
-using System.Collections.Generic;
 using Smead.RecordsManagement;
-using System.Data;
 using System;
-using System.Collections;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Linq;
-using System.Diagnostics;
-using System.ComponentModel;
 using Microsoft.Extensions.Logging;
-using System.Reflection;
+using static FusionWebApi.Models.DatabaseSchema;
 
 namespace FusionWebApi.Controllers
 {
@@ -65,7 +53,7 @@ namespace FusionWebApi.Controllers
             var passport = m.GetPassport(User.Identity.Name);
             try
             {
-                model.getDbSchemas = await Task.Run(() => DatabaseSchema.ReturnDbSchema(passport));
+                model = await Task.Run(() => DatabaseSchema.ReturnDbSchema(passport));
             }
             catch (Exception ex)
             {
