@@ -318,11 +318,6 @@ namespace FusionWebApi.Controllers
                 else
                 {
                     getview = await Task.Run(() => v.GetviewData(viewid, pageNumber));
-                    if (pageNumber > getview.TotalPages)
-                    {
-                        getview.ErrorMessages.FusionCode = (int)EventCode.WrongValue;
-                        getview.ErrorMessages.FusionMessage = $"My friend Jerald Total page is {getview.TotalPages} and you entered {pageNumber} so please stop breaking my code :) :) :)";
-                    }
                 }
             }
 

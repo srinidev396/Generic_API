@@ -198,10 +198,16 @@ namespace FusionWebApi.Models
                 v.ListOfDatarows = Buildrows(param);
                 decimal totpages = (decimal)v.TotalRowsQuery / v.RowsPerPage;
                 v.TotalPages = Math.Ceiling(totpages);
+                if (pageNumber > v.TotalPages)
+                {
+                    v.ErrorMessages.FusionCode = (int)EventCode.WrongValue;
+                    v.ErrorMessages.FusionMessage = $"That page number {pageNumber} is incorrect";
+                }
             }
             else
             {
-                //no permission
+                v.ErrorMessages.FusionCode = (int)EventCode.insufficientpermissions;
+                v.ErrorMessages.FusionMessage = "Insufficient permission";
             }
             
             return v;
