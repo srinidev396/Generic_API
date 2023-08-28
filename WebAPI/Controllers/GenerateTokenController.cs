@@ -36,6 +36,7 @@ namespace FusionWebApi.Controllers
             passWord = passWord == null ? string.Empty : passWord;
             database = database == null ? string.Empty : database;
             var m = new SecurityAccess(_config);
+            m.ErrorMessages.TimeStemp = DateTime.Now;
             var token = string.Empty;
             try
             {
