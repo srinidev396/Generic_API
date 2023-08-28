@@ -29,7 +29,7 @@ namespace FusionWebApi.Controllers
         public async Task<UserViews> GetUserViews()
         {
             var model = new UserViews();
-            model.ErrorMessages.TimeStemp = DateTime.Now;
+            model.ErrorMessages.TimeStamp = DateTime.Now;
             var m = new SecurityAccess(_config);
             var passport = m.GetPassport(User.Identity.Name);
             try
@@ -40,7 +40,7 @@ namespace FusionWebApi.Controllers
             {
                 model.ErrorMessages.Code = ex.HResult;
                 model.ErrorMessages.Message = ex.Message;
-                model.ErrorMessages.TimeStemp = DateTime.Now;
+                model.ErrorMessages.TimeStamp = DateTime.Now;
                 _logger.LogError($"{ex.Message} DataBaseName: {passport.DatabaseName} UserName: {passport.UserName}");
 
             }
@@ -51,7 +51,7 @@ namespace FusionWebApi.Controllers
         public async Task<SchemaModel> GetDbSchema()
         {
             var model = new SchemaModel();
-            model.ErrorMessages.TimeStemp = DateTime.Now;
+            model.ErrorMessages.TimeStamp = DateTime.Now;
             var m = new SecurityAccess(_config);
             var passport = m.GetPassport(User.Identity.Name);
             try
@@ -62,7 +62,7 @@ namespace FusionWebApi.Controllers
             {
                 model.ErrorMessages.Code = ex.HResult;
                 model.ErrorMessages.Message = ex.Message;
-                model.ErrorMessages.TimeStemp = DateTime.Now;
+                model.ErrorMessages.TimeStamp = DateTime.Now;
                 _logger.LogError($"{ex.Message} DataBaseName: {passport.DatabaseName} UserName: {passport.UserName}");
             }
             return model;
@@ -72,7 +72,7 @@ namespace FusionWebApi.Controllers
         public async Task<TablesSchema> GetTableSchema(string TableName)
         {
             TablesSchema model = new TablesSchema();
-            model.ErrorMessages.TimeStemp = DateTime.Now;
+            model.ErrorMessages.TimeStamp = DateTime.Now;
             var m = new SecurityAccess(_config);
             var passport = m.GetPassport(User.Identity.Name);
             try
@@ -83,7 +83,7 @@ namespace FusionWebApi.Controllers
             {
                 model.ErrorMessages.Code = ex.HResult;
                 model.ErrorMessages.Message = ex.Message;
-                model.ErrorMessages.TimeStemp = DateTime.Now;
+                model.ErrorMessages.TimeStamp = DateTime.Now;
                 _logger.LogError($"{ex.Message} DataBaseName: {passport.DatabaseName} UserName: {passport.UserName}");
             }
             return model;
@@ -93,7 +93,7 @@ namespace FusionWebApi.Controllers
         public async Task<Records> NewRecord(UIPostModel userdata)
         {
             var model = new Records();
-            model.ErrorMessages.TimeStemp = DateTime.Now;
+            model.ErrorMessages.TimeStamp = DateTime.Now;
             if (userdata.PostRow.Count == 0)
             {
                 model.ErrorMessages.FusionCode = (int)EventCode.NoColumn;
@@ -122,7 +122,7 @@ namespace FusionWebApi.Controllers
             {
                 model.ErrorMessages.Code = ex.HResult;
                 model.ErrorMessages.Message = ex.Message;
-                model.ErrorMessages.TimeStemp = DateTime.Now;
+                model.ErrorMessages.TimeStamp = DateTime.Now;
                 _logger.LogError($"{ex.Message} DataBaseName: {passport.DatabaseName} UserName: {passport.UserName}");
             }
             //var rr = HttpContext.Connection.RemoteIpAddress.MapToIPv4();
@@ -136,7 +136,7 @@ namespace FusionWebApi.Controllers
         public async Task<Records> NewRecordMulti(UIPostModel userdata)
         {
             var model = new Records();
-            model.ErrorMessages.TimeStemp = DateTime.Now;
+            model.ErrorMessages.TimeStamp = DateTime.Now;
             if (userdata.PostMultiRows.Count == 0)
             {
                 model.ErrorMessages.FusionCode = (int)EventCode.NoRow;
@@ -157,7 +157,7 @@ namespace FusionWebApi.Controllers
             {
                 model.ErrorMessages.Code = ex.HResult;
                 model.ErrorMessages.Message = ex.Message;
-                model.ErrorMessages.TimeStemp = DateTime.Now;
+                model.ErrorMessages.TimeStamp = DateTime.Now;
                 _logger.LogError($"{ex.Message} DataBaseName: {passport.DatabaseName} UserName: {passport.UserName}");
             }
             //var rr = HttpContext.Connection.RemoteIpAddress.MapToIPv4();
@@ -169,7 +169,7 @@ namespace FusionWebApi.Controllers
         {
 
             var model = new Records();
-            model.ErrorMessages.TimeStemp = DateTime.Now;
+            model.ErrorMessages.TimeStamp = DateTime.Now;
             if (userdata.PostRow.Count == 0)
             {
                 model.ErrorMessages.FusionCode = (int)EventCode.NoColumn;
@@ -198,7 +198,7 @@ namespace FusionWebApi.Controllers
             {
                 model.ErrorMessages.Code = ex.HResult;
                 model.ErrorMessages.Message = ex.Message;
-                model.ErrorMessages.TimeStemp = DateTime.Now;
+                model.ErrorMessages.TimeStamp = DateTime.Now;
                 _logger.LogError($"{ex.Message} DataBaseName: {passport.DatabaseName} UserName: {passport.UserName}");
 
             }
@@ -210,7 +210,7 @@ namespace FusionWebApi.Controllers
         public async Task<Records> EditRecordByColumn(UIPostModel userdata)
         {
             var model = new Records();
-            model.ErrorMessages.TimeStemp = DateTime.Now;
+            model.ErrorMessages.TimeStamp = DateTime.Now;
             if (userdata.PostRow.Count == 0)
             {
                 model.ErrorMessages.FusionCode = (int)EventCode.NoColumn;
@@ -231,7 +231,7 @@ namespace FusionWebApi.Controllers
             {
                 model.ErrorMessages.Code = ex.HResult;
                 model.ErrorMessages.Message = ex.Message;
-                model.ErrorMessages.TimeStemp = DateTime.Now;
+                model.ErrorMessages.TimeStamp = DateTime.Now;
                 _logger.LogError($"{ex.Message} DataBaseName: {passport.DatabaseName} UserName: {passport.UserName}");
             }
             return model;
@@ -241,7 +241,7 @@ namespace FusionWebApi.Controllers
         public async Task<Records> EditIfNotExistAdd(UIPostModel userdata)
         {
             var model = new Records();
-            model.ErrorMessages.TimeStemp = DateTime.Now;
+            model.ErrorMessages.TimeStamp = DateTime.Now;
             if (userdata.PostRow.Count == 0)
             {
                 model.ErrorMessages.FusionCode = (int)EventCode.NoColumn;
@@ -274,7 +274,7 @@ namespace FusionWebApi.Controllers
             {
                 model.ErrorMessages.Code = ex.HResult;
                 model.ErrorMessages.Message = ex.Message;
-                model.ErrorMessages.TimeStemp = DateTime.Now;
+                model.ErrorMessages.TimeStamp = DateTime.Now;
                 _logger.LogError($"{ex.Message} DataBaseName: {passport.DatabaseName} UserName: {passport.UserName}");
             }
             return model;
@@ -295,7 +295,7 @@ namespace FusionWebApi.Controllers
             {
                 model.Code = ex.HResult;
                 model.Message = ex.Message;
-                model.TimeStemp = DateTime.Now;
+                model.TimeStamp = DateTime.Now;
                 _logger.LogError($"{ex.Message} DataBaseName: {passport.DatabaseName} UserName: {passport.UserName}");
             }
         }
@@ -304,7 +304,7 @@ namespace FusionWebApi.Controllers
         public async Task<Viewmodel> GetViewData(int viewid, int pageNumber)
         {
             var getview = new Viewmodel();
-            getview.ErrorMessages.TimeStemp = DateTime.Now;
+            getview.ErrorMessages.TimeStamp = DateTime.Now;
             var m = new SecurityAccess(_config);
             var passport = m.GetPassport(User.Identity.Name);
             var v = new RecordsActions(passport);
@@ -331,7 +331,7 @@ namespace FusionWebApi.Controllers
                     getview.ErrorMessages.FusionMessage = $"View {viewid} is not found";
                 }
 
-                getview.ErrorMessages.TimeStemp = DateTime.Now;
+                getview.ErrorMessages.TimeStamp = DateTime.Now;
                 _logger.LogError($"{ex.Message} DataBaseName: {passport.DatabaseName} UserName: {passport.UserName}");
             }
 

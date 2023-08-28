@@ -36,7 +36,7 @@ namespace FusionWebApi.Controllers
             passWord = passWord == null ? string.Empty : passWord;
             database = database == null ? string.Empty : database;
             var m = new SecurityAccess(_config);
-            m.ErrorMessages.TimeStemp = DateTime.Now;
+            m.ErrorMessages.TimeStamp = DateTime.Now;
             var token = string.Empty;
             try
             {
@@ -86,7 +86,7 @@ namespace FusionWebApi.Controllers
                 m.ErrorMessages.Message = "";
             }
             m.ErrorMessages.Code = ex.HResult;
-            m.ErrorMessages.TimeStemp = DateTime.Now;
+            m.ErrorMessages.TimeStamp = DateTime.Now;
             
         }
     }
