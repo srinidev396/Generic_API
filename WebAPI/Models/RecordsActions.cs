@@ -49,8 +49,7 @@ namespace FusionWebApi.Models
                 withBlock.AfterData = param.AfterDataTrimmed;
                 withBlock.BeforeData = string.Empty;
 
-
-                //Auditing.AuditUpdates(AuditType.WebAccess, passport);
+                Auditing.AuditUpdates(AuditType.WebAccess, passport);
 
                 string retentionCode = Query.SetRetentionCode(param.TableName, param.TableInfo, param.KeyValue, passport);
                 DataRow row = Navigation.GetSingleRow(param.TableInfo, param.KeyValue, param.KeyField, passport);
