@@ -23,14 +23,13 @@ namespace FusionWebApi.Models
         public List<List<PostColumns>> PostMultiRows { get; set; }
     }
 
-    public class PostColumns
+    public class PostColumns : IHasValue
     {
         public string Value { get; set; }
         [Required]
         public string ColumnName { get; set; }
         [HiddenInput]
         public string DataTypeFullName { get; set; }
-        //public string DataTypeFullName { get; set; }
     }
 
     public class Viewmodel
@@ -128,7 +127,7 @@ namespace FusionWebApi.Models
         NoRow = 6,
         RecordUpdated = 7,
         insufficientpermissions = 8,
-
+        IllegalData = 9
     }
 
 

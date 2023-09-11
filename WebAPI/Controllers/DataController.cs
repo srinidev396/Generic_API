@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using static FusionWebApi.Models.DatabaseSchema;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace FusionWebApi.Controllers
 {
@@ -92,6 +93,7 @@ namespace FusionWebApi.Controllers
         [Route("NewRecord")]
         public async Task<Records> NewRecord(UIPostModel userdata)
         {
+
             var model = new Records();
             model.ErrorMessages.TimeStamp = DateTime.Now;
             if (userdata.PostRow.Count == 0)
@@ -106,6 +108,12 @@ namespace FusionWebApi.Controllers
             {
                 await Task.Run(() => DatabaseSchema.GetColumntype(passport, userdata));
                 var addrecord = new RecordsActions(passport);
+                if (!addrecord.DataValidation<PostColumns>(userdata.PostRow))
+                {
+                    model.ErrorMessages.FusionCode = (int)EventCode.IllegalData;
+                    model.ErrorMessages.FusionMessage = "Illegal Data";
+                    return model;
+                }
                 if (await Task.Run(() => addrecord.AddNewRow(userdata)))
                 {
                     model.ErrorMessages.FusionCode = (int)EventCode.NewRecordAdded;
@@ -145,13 +153,34 @@ namespace FusionWebApi.Controllers
             }
             var m = new SecurityAccess(_config);
             var passport = m.GetPassport(User.Identity.Name);
+            var start = DateTime.Now;
             try
             {
                 await Task.Run(() => DatabaseSchema.GetColumntypeMulti(passport, userdata));
                 var addrecord = new RecordsActions(passport);
+
+                for (int i = 0; i < userdata.PostMultiRows.Count; i++)
+                {
+                    if (!addrecord.DataValidation<PostColumns>(userdata.PostMultiRows[i]))
+                    {
+                        model.ErrorMessages.FusionCode = (int)EventCode.IllegalData;
+                        model.ErrorMessages.FusionMessage = "Illegal Data";
+                        return model;
+                    }
+                }
+                
                 model.ErrorMessages.FusionMessage = await Task.Run(() => addrecord.AddNewRowMulti(userdata));
                 model.ErrorMessages.FusionCode = (int)EventCode.NewRecordsAdded;
-
+                if (!model.ErrorMessages.FusionMessage.Contains("Added"))
+                {
+                    model.ErrorMessages.Code = 0;
+                    model.ErrorMessages.Message = model.ErrorMessages.FusionMessage;
+                    model.ErrorMessages.FusionMessage = "";
+                    model.ErrorMessages.FusionCode = 0;
+                }
+                var end = DateTime.Now;
+                var total = end - start;
+                model.ErrorMessages.FusionMessage += $"/ Insertion process time: {total}";
             }
             catch (Exception ex)
             {
@@ -167,7 +196,6 @@ namespace FusionWebApi.Controllers
         [Route("EditRecord")]
         public async Task<Records> EditRecord(UIPostModel userdata)
         {
-
             var model = new Records();
             model.ErrorMessages.TimeStamp = DateTime.Now;
             if (userdata.PostRow.Count == 0)
@@ -182,6 +210,14 @@ namespace FusionWebApi.Controllers
             {
                 await Task.Run(() => DatabaseSchema.GetColumntype(passport, userdata));
                 var editrecord = new RecordsActions(passport);
+
+                if (!editrecord.DataValidation<PostColumns>(userdata.PostRow))
+                {
+                    model.ErrorMessages.FusionCode = (int)EventCode.IllegalData;
+                    model.ErrorMessages.FusionMessage = "Illegal Data";
+                    return model;
+                }
+
                 if (await Task.Run(() => editrecord.EditRow(userdata)))
                 {
                     model.ErrorMessages.FusionCode = (int)(EventCode.RecordUpdated);
@@ -224,8 +260,20 @@ namespace FusionWebApi.Controllers
             {
                 await Task.Run(() => DatabaseSchema.GetColumntype(passport, userdata));
                 var editrecord = new RecordsActions(passport);
+                if (!editrecord.DataValidation<PostColumns>(userdata.PostRow))
+                {
+                    model.ErrorMessages.FusionCode = (int)EventCode.IllegalData;
+                    model.ErrorMessages.FusionMessage = "Illegal Data";
+                    return model;
+                }
                 model.ErrorMessages.FusionCode = (int)EventCode.RecordUpdated;
                 model.ErrorMessages.FusionMessage = await Task.Run(() => editrecord.EditRecordByColumn(userdata));
+                if (!model.ErrorMessages.FusionMessage.Contains("Updated"))
+                {
+                    model.ErrorMessages.FusionCode = 0;
+                    model.ErrorMessages.Message = model.ErrorMessages.FusionMessage;
+                    model.ErrorMessages.FusionMessage = "";
+                }
             }
             catch (Exception ex)
             {
@@ -240,6 +288,10 @@ namespace FusionWebApi.Controllers
         [Route("EditIfNotExistAdd")]
         public async Task<Records> EditIfNotExistAdd(UIPostModel userdata)
         {
+            //must be false as we don't support multi add or update in this function.
+            //this written just to protect developers in case they setup the property to true.
+            userdata.IsMultyupdate = false;
+
             var model = new Records();
             model.ErrorMessages.TimeStamp = DateTime.Now;
             if (userdata.PostRow.Count == 0)
@@ -255,8 +307,22 @@ namespace FusionWebApi.Controllers
             {
                 await Task.Run(() => DatabaseSchema.GetColumntype(passport, userdata));
                 var record = new RecordsActions(passport);
-                model.FusionMessage = await Task.Run(() => record.EditRecordByColumn(userdata));
-                if (model.FusionMessage.Contains("0"))
+                if (!record.DataValidation<PostColumns>(userdata.PostRow))
+                {
+                    model.ErrorMessages.FusionCode = (int)EventCode.IllegalData;
+                    model.ErrorMessages.FusionMessage = "Illegal Data";
+                    return model;
+                }
+                model.ErrorMessages.FusionMessage = await Task.Run(() => record.EditRecordByColumn(userdata));
+                model.ErrorMessages.FusionCode = (int)EventCode.RecordUpdated;
+                if (!model.ErrorMessages.FusionMessage.Contains("Updated"))
+                {
+                    model.ErrorMessages.FusionCode = 0;
+                    model.ErrorMessages.Message = model.ErrorMessages.FusionMessage;
+                    model.ErrorMessages.FusionMessage = "";
+                }
+
+                if (model.ErrorMessages.Message.Contains("0"))
                 {
                     if (await Task.Run(() => record.AddNewRow(userdata)))
                     {
@@ -283,6 +349,7 @@ namespace FusionWebApi.Controllers
         [Route("TestExceptionMethod")]
         public void TestExceptionMethod()
         {
+
             var model = new ErrorMessages();
             var m = new SecurityAccess(_config);
             var passport = m.GetPassport(User.Identity.Name);

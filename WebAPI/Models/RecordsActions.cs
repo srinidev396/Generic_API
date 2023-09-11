@@ -10,6 +10,8 @@ using System.Runtime.Versioning;
 using Microsoft.VisualBasic;
 using System.Data.SqlClient;
 using System.Diagnostics;
+using Newtonsoft.Json.Linq;
+using System.Text.RegularExpressions;
 
 namespace FusionWebApi.Models
 {
@@ -59,7 +61,8 @@ namespace FusionWebApi.Models
         }
         public string AddNewRowMulti(UIPostModel PostData)
         {
-            return Query.AddNewMultiRecords(passport, PostData.TableName, DataFieldValuesMulti(PostData.PostMultiRows)); 
+
+            return Query.AddNewMultiRecords(passport, PostData.TableName, DataFieldValuesMulti(PostData.PostMultiRows));
         }
         public bool EditRow(UIPostModel EditData)
         {
@@ -209,7 +212,7 @@ namespace FusionWebApi.Models
                 v.ErrorMessages.FusionCode = (int)EventCode.insufficientpermissions;
                 v.ErrorMessages.FusionMessage = "Insufficient permission";
             }
-            
+
             return v;
         }
         private int RowPerpage(Passport pass, int viewid)
@@ -378,5 +381,26 @@ namespace FusionWebApi.Models
             }
         }
 
+        public bool DataValidation<T>(List<T> objlist) where T : IHasValue
+        {
+            string pattern = @"<script>.*?</script>";
+            Regex regex = new Regex(pattern);
+            if (objlist.Count == 0) return true;
+
+            foreach (T obj in objlist)
+            {
+                var x = regex.Match(obj.Value);
+                if (x.Success)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+    //Interfaces
+    public interface IHasValue
+    {
+        string Value { get; }
     }
 }

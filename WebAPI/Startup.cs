@@ -33,6 +33,16 @@ namespace FusionWebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: "PolicyCore",
+                builder =>
+                {
+                    builder.WithOrigins(Configuration["WithOrigins"]);
+                    builder.WithMethods(Configuration["WithMethods"]);
+                    builder.WithHeaders(Configuration["WithHeaders"]);
+                });
+            });
             services.AddLogging(loggingBuilder =>
             {
                 loggingBuilder.ClearProviders();
@@ -105,6 +115,7 @@ namespace FusionWebApi
             }
 
             app.UseHttpsRedirection();
+            app.UseCors("PolicyCore");
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
