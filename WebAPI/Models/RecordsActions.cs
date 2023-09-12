@@ -79,6 +79,7 @@ namespace FusionWebApi.Models
 
                 // linkscript before
                 ScriptReturn result = null;
+               var BeforeDataTrimmed = GetBeforeDataTrimmed(EditData.PostRow, passport,param);
                 // save row
                 Query.Save(param, "", param.KeyField, param.KeyValue, DataFieldValues(EditData.PostRow), passport, result);
 
@@ -90,7 +91,7 @@ namespace FusionWebApi.Models
                     withBlock.ClientIpAddress = "RestAPI Call";
                     withBlock.ActionType = AuditType.WebAccessActionType.UpdateRecord;
                     withBlock.AfterData = param.AfterDataTrimmed;
-                    withBlock.BeforeData = param.BeforeDataTrimmed;
+                    withBlock.BeforeData = BeforeDataTrimmed;
                 }
 
                 Auditing.AuditUpdates(AuditType.WebAccess, passport);
@@ -102,6 +103,44 @@ namespace FusionWebApi.Models
             }
             return ispass;
 
+        }
+        private string GetBeforeDataTrimmed(List<PostColumns> lst, Passport pass, Parameters param)
+        {
+            string columns = string.Empty;
+            string sql = string.Empty;
+            string beforedata = string.Empty;
+            var listofcolumns = new List<string>();
+            var table = new DataTable();
+
+            var counter = 1;
+            foreach (PostColumns col in lst)
+            {
+                listofcolumns.Add(col.ColumnName);
+
+                if(lst.Count == counter)
+                {
+                    columns += $"[{col.ColumnName}]";
+                }
+                else
+                {
+                    columns += $"[{col.ColumnName}],";
+                }
+                counter++;
+            }
+
+            sql = $"SELECT {columns} FROM {param.TableName} WHERE {param.KeyField} = '{param.KeyValue}'";
+            var conn = pass.Connection();
+            var cmd = new SqlCommand(sql, conn);
+            var adp = new SqlDataAdapter(cmd);
+            adp.Fill(table);
+           
+            for (int i = 0; i < listofcolumns.Count; i++)
+            {
+                beforedata += $"{listofcolumns[i].ToString()}: {table.Rows[0][listofcolumns[i].ToString()]} ";
+            }
+
+
+            return beforedata;
         }
         public string EditRecordByColumn(UIPostModel Ed)
         {
