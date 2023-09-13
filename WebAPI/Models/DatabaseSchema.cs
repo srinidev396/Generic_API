@@ -129,7 +129,7 @@ namespace FusionWebApi.Models
             return tc;
         }
 
-        public static void GetColumntype(Passport passport, UIPostModel userdata)
+        public static string GetColumntype(Passport passport, UIPostModel userdata)
         {
             var schema = DatabaseSchema.GetTableSchema(userdata.TableName, passport).ListOfColumns;
             var counter = 0;
@@ -166,13 +166,18 @@ namespace FusionWebApi.Models
                             break;
                         default:
                             break;
-                    }
+                    }           
+                }
+                else
+                {
+                    return $"Column {c.ColumnName} doesn't exist!";
                 }
                 counter++;
             }
+            return "true";
         }
 
-        public static void GetColumntypeMulti(Passport passport, UIPostModel userdata)
+        public static string GetColumntypeMulti(Passport passport, UIPostModel userdata)
         {
             var schema = DatabaseSchema.GetTableSchema(userdata.TableName, passport).ListOfColumns;
             var counter = 0;
@@ -214,8 +219,14 @@ namespace FusionWebApi.Models
                         }
                         counter++;
                     }
+                    else
+                    {
+                        return $"Column {userdata.PostMultiRows[i][j].ColumnName} doesn't exist!";
+
+                    }
                 }
             }
+            return "true";
         }
         private static DataTable GetCustomerTablesSchema(SqlCommand cmd)
         {

@@ -127,7 +127,8 @@ namespace FusionWebApi.Models
         NoRow = 6,
         RecordUpdated = 7,
         insufficientpermissions = 8,
-        IllegalData = 9
+        IllegalData = 9,
+        ColumnIsnotExist = 10
     }
 
 

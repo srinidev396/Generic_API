@@ -106,7 +106,13 @@ namespace FusionWebApi.Controllers
             var passport = m.GetPassport(User.Identity.Name);
             try
             {
-                await Task.Run(() => DatabaseSchema.GetColumntype(passport, userdata));
+                var checkcolumns = await Task.Run(() => DatabaseSchema.GetColumntype(passport, userdata));
+                if (checkcolumns != "true")
+                {
+                    model.ErrorMessages.FusionMessage = checkcolumns;
+                    model.ErrorMessages.FusionCode = (int)EventCode.ColumnIsnotExist;
+                    return model;
+                }
                 var addrecord = new RecordsActions(passport);
                 if (!addrecord.DataValidation<PostColumns>(userdata.PostRow))
                 {
@@ -156,7 +162,13 @@ namespace FusionWebApi.Controllers
             var start = DateTime.Now;
             try
             {
-                await Task.Run(() => DatabaseSchema.GetColumntypeMulti(passport, userdata));
+                var checkcolumns = await Task.Run(() => DatabaseSchema.GetColumntypeMulti(passport, userdata));
+                if (checkcolumns != "true")
+                {
+                    model.ErrorMessages.FusionMessage = checkcolumns;
+                    model.ErrorMessages.FusionCode = (int)EventCode.ColumnIsnotExist;
+                    return model;
+                }
                 var addrecord = new RecordsActions(passport);
 
                 for (int i = 0; i < userdata.PostMultiRows.Count; i++)
@@ -208,7 +220,13 @@ namespace FusionWebApi.Controllers
             var passport = m.GetPassport(User.Identity.Name);
             try
             {
-                await Task.Run(() => DatabaseSchema.GetColumntype(passport, userdata));
+                var checkcolumns = await Task.Run(() => DatabaseSchema.GetColumntype(passport, userdata));
+                if(checkcolumns != "true")
+                {
+                    model.ErrorMessages.FusionMessage = checkcolumns;
+                    model.ErrorMessages.FusionCode = (int)EventCode.ColumnIsnotExist;
+                    return model;
+                }
                 var editrecord = new RecordsActions(passport);
 
                 if (!editrecord.DataValidation<PostColumns>(userdata.PostRow))
@@ -258,7 +276,13 @@ namespace FusionWebApi.Controllers
             var passport = m.GetPassport(User.Identity.Name);
             try
             {
-                await Task.Run(() => DatabaseSchema.GetColumntype(passport, userdata));
+                var checkcolumns = await Task.Run(() => DatabaseSchema.GetColumntype(passport, userdata));
+                if (checkcolumns != "true")
+                {
+                    model.ErrorMessages.FusionMessage = checkcolumns;
+                    model.ErrorMessages.FusionCode = (int)EventCode.ColumnIsnotExist;
+                    return model;
+                }
                 var editrecord = new RecordsActions(passport);
                 if (!editrecord.DataValidation<PostColumns>(userdata.PostRow))
                 {
@@ -305,7 +329,13 @@ namespace FusionWebApi.Controllers
             var passport = m.GetPassport(User.Identity.Name);
             try
             {
-                await Task.Run(() => DatabaseSchema.GetColumntype(passport, userdata));
+                var checkcolumns = await Task.Run(() => DatabaseSchema.GetColumntype(passport, userdata));
+                if (checkcolumns != "true")
+                {
+                    model.ErrorMessages.FusionMessage = checkcolumns;
+                    model.ErrorMessages.FusionCode = (int)EventCode.ColumnIsnotExist;
+                    return model;
+                }
                 var record = new RecordsActions(passport);
                 if (!record.DataValidation<PostColumns>(userdata.PostRow))
                 {
