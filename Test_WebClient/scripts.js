@@ -4,7 +4,11 @@ var msg = document.getElementById("msgid");
 async function Auth() {
     var rdata = ""
     var requestData = "json"
-    var linkurl = `${url}/GenerateToken?userName=administrator&passWord=password$&database=cfg`;
+    var userName = "administrator";
+    var password = 'password$';
+    var database = "QaData";
+
+    var linkurl = `${url}/GenerateToken?userName=${userName}&passWord=${password}&database=${database}`;
     const call = await fetch(`${linkurl}`);
     if (requestData === "html")
         rdata = await call.text();
@@ -18,19 +22,24 @@ async function Auth() {
 function NewRecord() {
     api = "Data/NewRecord";
     var data = {
-        "tableName": "Documents",
+        "tableName": "boxes",
         "postRow": [
             {
                 "value": "48",
-                "columnName": "DocumentID"
+                "columnName": "Descsription"
             },
             {
-                "value": "new data",
-                "columnName": "DocumentName"
+                "value": "1",
+                "columnName": "yesno"
+            },
+            {
+                "value": "moti test",
+                "columnName": "OffSiteNo"
             }
+
         ]
     }
-    FetchPost(api, data).then((data) => {
+    FETCHPOST(api, data).then((data) => {
         msg.innerHTML = JSON.stringify(data);
     }).catch((data) => {
         msg.innerHTML = JSON.stringify(data);
@@ -41,37 +50,20 @@ function NewRecordMulti() {
     api = "Data/NewRecordMulti";
     var row = [];
     var rows = [];
-    for (let i = 0; i < 10000; i++) {
+    for (let i = 0; i < 100; i++) {
         var x = i + 1;
-        row.push({ columnName: "Id", value: `id${i}` })
-        row.push({ columnName: "Description", value: `<dec${i}>` })
-        row.push({ columnName: "Out", value: `0` })
+        row.push({ columnName: "Descripdtion", value: `<dec${i}>` })
+        row.push({ columnName: "OffSiteNo", value: `<off${i}>` })
+        row.push({ columnName: "yesno", value: `1` })
         rows.push(row);
         row = [];
     }
-    /* rows = [
-        [
-            { "Value": "1111", "ColumnName": "Id" },
-            { "Value": "hello", "ColumnName": "Description" },
-            { "Value": "0", "ColumnName": "Out" },
-        ],
-        [
-            { "Value": "1112", "ColumnName": "Id" },
-            { "Value": "hello", "ColumnName": "Description" },
-            { "Value": "0", "ColumnName": "Out" },
-        ],
-        [
-            { "Value": "1113", "ColumnName": "Id" },
-            { "Value": "hello", "ColumnName": "Description" },
-            { "Value": "0", "ColumnName": "Out" },
-        ]
-    ] */
     var data = {
         "tableName": "Boxes",
         "postMultiRows": rows
     }
 
-    FetchPost(api, data).then((data) => {
+    FETCHPOST(api, data).then((data) => {
         msg.innerHTML = JSON.stringify(data);
     }).catch((data) => {
         msg.innerHTML = JSON.stringify(data);
@@ -83,18 +75,22 @@ function EditRecord() {
     api = "Data/EditRecord";
 
     var data = {
-        "tableName": "Documents",
-        "keyValue": "100",
-        "fieldName": "DocumentID",
+        "tableName": "Boxes",
+        "keyValue": "3127",
+        "fieldName": "id",
         "postRow": [
             {
-                "value": "editrecord",
-                "columnName": "DocumentName",
+                "value": "test by moti",
+                "columnName": "Integerfield",
+            },
+            {
+                "value": "test offset",
+                "columnName": "OffSiteNo"
             }
         ],
     }
 
-    FetchPost(api, data).then((data) => {
+    FETCHPOST(api, data).then((data) => {
         msg.innerHTML = JSON.stringify(data);
     }).catch((data) => {
         msg.innerHTML = JSON.stringify(data);
@@ -105,19 +101,19 @@ function EditRecordByColumn() {
     api = "Data/EditRecordByColumn";
 
     var data = {
-        "tableName": "Documents",
-        "keyValue": "moti",
-        "fieldName": "DocumentName",
+        "tableName": "Boxes",
+        "keyValue": "3127",
+        "fieldName": "Id",
         "isMultyupdate": true,
         "postRow": [
             {
-                "value": "hello moti",
-                "columnName": "DocumentName",
+                "value": "HelloMate",
+                "columnName": "Descrdiption",
             }
         ],
     }
 
-    FetchPost(api, data).then((data) => {
+    FETCHPOST(api, data).then((data) => {
         msg.innerHTML = JSON.stringify(data);
     }).catch((data) => {
         msg.innerHTML = JSON.stringify(data);
@@ -128,30 +124,58 @@ function EditIfnotExistAdd() {
     api = "Data/EditIfNotExistAdd";
 
     var data = {
-        "tableName": "Documents",
+        "tableName": "Boxes",
         "keyValue": "101",
         "fieldName": "DocumentID",
         "postRow": [
             {
-                "value": "101",
-                "columnName": "DocumentID"
-            },
-            {
-                "value": "<script>adfads",
-                "columnName": "DocumentName"
+                "value": "Hello",
+                "columnName": "Descridption"
             }
         ],
     }
 
-    FetchPost(api, data).then((data) => {
+    FETCHPOST(api, data).then((data) => {
         msg.innerHTML = JSON.stringify(data);
     }).catch((data) => {
         msg.innerHTML = JSON.stringify(data);
     })
 }
 
+function GetUserViews() {
+    var api = "Data/GetUserViews";
+    FETCHGET(api).then((data) => {
+        msg.innerHTML = JSON.stringify(data);
+    })
+}
 
-async function FetchPost(api, data) {
+function GetDbSchema() {
+    var api = `Data/GetDbSchema`;
+    FETCHGET(api).then((data) => {
+        msg.innerHTML = JSON.stringify(data);
+    })
+}
+
+function GetTableSchema() {
+    var tableName = "Boxes";
+    var api = `Data/GetTableSchema?TableName=${tableName}`;
+    FETCHGET(api).then((data) => {
+        msg.innerHTML = JSON.stringify(data);
+    })
+}
+
+function GetViewData(){
+    var viewid = 45;
+    var pageNumber = 2;
+    var api = `Data/GetViewData?viewid=${viewid}&pageNumber=${pageNumber}`
+    FETCHGET(api).then((data) => {
+      msg.innerHTML = JSON.stringify(data);
+    });
+}
+
+
+async function FETCHPOST(api, data) {
+    msg.innerHTML = "Working on it.........";
     var linkurl = `${url}/${api}`;
     const response = await fetch(linkurl, {
         method: 'POST',
@@ -168,4 +192,20 @@ async function FetchPost(api, data) {
     }
 }
 
+async function FETCHGET(api) {
+    msg.innerHTML = "Working on it.........";
+    var linkurl = `${url}/${api}`;
+    var token = `Bearer ${localStorage.getItem("token")}`
+    const call = await fetch(linkurl, {
+        method: 'GET',
+        headers: {
+            'Authorization': token,
+        },
+    });
+    if (call.ok == false) {
+        return call;
+    } else {
+        return await call.json();
+    }
+}
 

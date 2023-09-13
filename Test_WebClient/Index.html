@@ -1,17 +1,59 @@
 <html>
+
 <head>
-    <style></style>
+    <style>
+        .row {
+            display: flex;
+            flex-direction: row;
+            margin-top: 1px;
+            column-gap: 10px;
+        }
+
+        button {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #3498db;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        /* Optional: Add more styles for different button states (e.g., active, disabled) */
+        button:active {
+            background-color: #1f618d;
+        }
+    </style>
 </head>
+
 <body>
-    <button onclick="Auth()">Auth</button>
-    <button onclick="NewRecord()">Data/NewRecord</button>
-    <button onclick="EditRecord()">Data/EditRecord</button>
-    <button onclick="EditRecordByColumn()">Data/EditRecordByColumn</button>
-    <button onclick="EditIfnotExistAdd()">Data/EditIfNotExistAdd</button>
-    <button onclick="NewRecordMulti()">Data/NewRecordMulti</button>
-    
+    <h3>Authentication</h3>
+    <div class="row">
+        <button onclick="Auth()">Auth</button>
+    </div>
+    <h3>Inserting\updating data</h3>
+    <div class="row">
+        <button onclick="NewRecord()">Data/NewRecord</button>
+        <button onclick="EditRecord()">Data/EditRecord</button>
+        <button onclick="EditRecordByColumn()">Data/EditRecordByColumn</button>
+        <button onclick="EditIfnotExistAdd()">Data/EditIfNotExistAdd</button>
+        <button onclick="NewRecordMulti()">Data/NewRecordMulti</button>
+    </div>
+    <h3>Get data</h3>
+    <div class="row">
+        <button onclick="GetUserViews()">Data/GetUserViews</button>
+        <button onclick="GetDbSchema()">Data/GetDbSchema</button>
+        <button onclick="GetTableSchema()">Data/GetTableSchema</button>
+        <button onclick="GetViewData()">Data/GetViewData</button>
+    </div>
+    <h3 style="color: blue;">Results</h3>
     <p id="msgid"></p>
-     
 </body>
 
 
