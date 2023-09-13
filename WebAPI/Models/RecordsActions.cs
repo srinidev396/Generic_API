@@ -237,7 +237,9 @@ namespace FusionWebApi.Models
                 v.PageNumber = pageNumber;
                 v.ListOfHeaders = BuildNewTableHeaderData(param);
                 v.ListOfDatarows = Buildrows(param);
-                decimal totpages = (decimal)v.TotalRowsQuery / v.RowsPerPage;
+                int RowperPage = v.RowsPerPage == 0 ? 100 : v.RowsPerPage;
+                v.RowsPerPage = RowperPage;
+                decimal totpages = (decimal)v.TotalRowsQuery / RowperPage;
                 v.TotalPages = Math.Ceiling(totpages);
                 if (pageNumber > v.TotalPages)
                 {
