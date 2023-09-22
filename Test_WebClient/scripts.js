@@ -1,4 +1,5 @@
-var url = "http://localhost:2234";
+var url = "http://localhost:2234"; //"https://restapi.tabfusionrms.com";
+
 var msg = document.getElementById("msgid");
 //authenticate
 async function Auth() {
@@ -46,15 +47,19 @@ function NewRecord() {
     })
 }
 
+//software entery.
+//you call fusion api
+
 function NewRecordMulti() {
     api = "Data/NewRecordMulti";
     var row = [];
     var rows = [];
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 10; i++) {
         var x = i + 1;
-        row.push({ columnName: "Descripdtion", value: `<dec${i}>` })
+        row.push({ columnName: "Description", value: `<dec${i}>` })
         row.push({ columnName: "OffSiteNo", value: `<off${i}>` })
         row.push({ columnName: "yesno", value: `1` })
+        row.push({ columnName: "IntegerField", value: `1` })
         rows.push(row);
         row = [];
     }
@@ -80,11 +85,11 @@ function EditRecord() {
         "fieldName": "id",
         "postRow": [
             {
-                "value": "test by moti",
-                "columnName": "Integerfield",
+                "value": "3333",
+                "columnName": "IntegerField",
             },
             {
-                "value": "test offset",
+                "value": "helooffsetno",
                 "columnName": "OffSiteNo"
             }
         ],
@@ -102,13 +107,17 @@ function EditRecordByColumn() {
 
     var data = {
         "tableName": "Boxes",
-        "keyValue": "3127",
-        "fieldName": "Id",
+        "keyValue": "1",
+        "fieldName": "yesno",
         "isMultyupdate": true,
         "postRow": [
             {
-                "value": "HelloMate",
-                "columnName": "Descrdiption",
+                "value": "newoffset",
+                "columnName": "OffSiteNo",
+            },
+            {
+                "value": "moti",
+                "columnName": "Description",
             }
         ],
     }
@@ -125,12 +134,12 @@ function EditIfnotExistAdd() {
 
     var data = {
         "tableName": "Boxes",
-        "keyValue": "101",
-        "fieldName": "DocumentID",
+        "keyValue": "3127",
+        "fieldName": "Id",
         "postRow": [
             {
                 "value": "Hello",
-                "columnName": "Descridption"
+                "columnName": "Description"
             }
         ],
     }
