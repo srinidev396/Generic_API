@@ -18,6 +18,8 @@ namespace FusionWebApi.Models
 
     public class RecordsActions
     {
+        //private string KeyValue { get; set; }
+        //private string FieldName { get; set; }
         public RecordsActions(Passport passport)
         {
             this.passport = passport;
@@ -79,7 +81,7 @@ namespace FusionWebApi.Models
 
                 // linkscript before
                 ScriptReturn result = null;
-                var BeforeDataTrimmed = GetBeforeDataTrimmed(EditData.PostRow, passport, param)[0];
+                var BeforeDataTrimmed = GetBeforeDataTrimmedEdit(EditData.PostRow, passport, param)[0];
                 // save row
                 Query.Save(param, "", param.KeyField, param.KeyValue, DataFieldValues(EditData.PostRow), passport, result);
 
@@ -104,7 +106,62 @@ namespace FusionWebApi.Models
             return ispass;
 
         }
-        private List<string> GetBeforeDataTrimmed(List<PostColumns> lst, Passport pass, Parameters param)
+        private List<string> GetBeforeDataTrimmedEditBycolumn(UIPostModel model, Passport pass, string fieldnametype)
+        {
+            string columns = string.Empty;
+            string sql = string.Empty;
+            string beforedata = string.Empty;
+            var listofcolumns = new List<string>();
+            var listofrows = new List<string>();
+            var table = new DataTable();
+
+            var counter = 1;
+            foreach (PostColumns col in model.PostRow)
+            {
+                listofcolumns.Add(col.ColumnName);
+
+                if (model.PostRow.Count == counter)
+                {
+                    columns += $"[{col.ColumnName}]";
+                }
+                else
+                {
+                    columns += $"[{col.ColumnName}],";
+                }
+                counter++;
+            }
+
+            if(model.keyValue.ToLower() == "null")
+            {
+                sql = $"SELECT {columns} FROM {model.TableName} WHERE {model.FieldName} is {model.keyValue}";
+            }
+            else if (fieldnametype == "text")
+            {
+                sql = $"SELECT {columns} FROM {model.TableName} WHERE CAST({model.FieldName} as nvarchar) = '{model.keyValue}'";
+            }
+            else
+            {
+                sql = $"SELECT {columns} FROM {model.TableName} WHERE {model.FieldName} = '{model.keyValue}'";
+            }
+
+            var conn = pass.Connection();
+            var cmd = new SqlCommand(sql, conn);
+            var adp = new SqlDataAdapter(cmd);
+            adp.Fill(table);
+            for (int j = 0; j < table.Rows.Count; j++)
+            {
+                for (int i = 0; i < listofcolumns.Count; i++)
+                {
+                    beforedata += $"{listofcolumns[i].ToString()}: {table.Rows[j][listofcolumns[i].ToString()]}";
+                }
+                listofrows.Add(beforedata);
+                beforedata = string.Empty;
+            }
+
+
+            return listofrows;
+        }
+        private List<string> GetBeforeDataTrimmedEdit(List<PostColumns> lst, Passport pass, Parameters param)
         {
             string columns = string.Empty;
             string sql = string.Empty;
@@ -149,15 +206,16 @@ namespace FusionWebApi.Models
         }
         public string EditRecordByColumn(UIPostModel Ed)
         {
-            var param = new Parameters(Ed.TableName, passport);
-            param.Scope = ScopeEnum.Table;
-            param.KeyValue = Ed.keyValue;
-            param.NewRecord = false;
-            param.KeyField = Ed.FieldName;
-            param.BeforeData = "";
-            var ListbeforeDataTrim = GetBeforeDataTrimmed(Ed.PostRow, passport, param);
-            var data = DataFieldValues(Ed.PostRow);
+            //var param = new Parameters(Ed.TableName, passport);
+            //param.Scope = ScopeEnum.Table;
+            //param.KeyValue = Ed.keyValue;
+            //param.NewRecord = false;
+            //param.KeyField = Ed.FieldName;
+            //param.BeforeData = "";
             var FieldNameType = DatabaseSchema.GetTableSchema(Ed.TableName, passport).ListOfColumns.Where(a => a.ColumnName.ToLower() == Ed.FieldName.ToLower()).FirstOrDefault().DataType;
+            var ListbeforeDataTrim = GetBeforeDataTrimmedEditBycolumn(Ed, passport, FieldNameType);
+            var data = DataFieldValues(Ed.PostRow);
+            
             return Query.UpdateRecordsByColumn(Ed.keyValue, Ed.FieldName, Ed.TableName, passport, data, Ed.IsMultyupdate, FieldNameType, ListbeforeDataTrim);
         }
         private List<FieldValue> DataFieldValues(List<PostColumns> ListOfcolumns)
