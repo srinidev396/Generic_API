@@ -79,7 +79,7 @@ namespace FusionWebApi.Models
 
                 // linkscript before
                 ScriptReturn result = null;
-               var BeforeDataTrimmed = GetBeforeDataTrimmed(EditData.PostRow, passport,param);
+                var BeforeDataTrimmed = GetBeforeDataTrimmed(EditData.PostRow, passport, param)[0];
                 // save row
                 Query.Save(param, "", param.KeyField, param.KeyValue, DataFieldValues(EditData.PostRow), passport, result);
 
@@ -104,12 +104,13 @@ namespace FusionWebApi.Models
             return ispass;
 
         }
-        private string GetBeforeDataTrimmed(List<PostColumns> lst, Passport pass, Parameters param)
+        private List<string> GetBeforeDataTrimmed(List<PostColumns> lst, Passport pass, Parameters param)
         {
             string columns = string.Empty;
             string sql = string.Empty;
             string beforedata = string.Empty;
             var listofcolumns = new List<string>();
+            var listofrows = new List<string>();
             var table = new DataTable();
 
             var counter = 1;
@@ -117,7 +118,7 @@ namespace FusionWebApi.Models
             {
                 listofcolumns.Add(col.ColumnName);
 
-                if(lst.Count == counter)
+                if (lst.Count == counter)
                 {
                     columns += $"[{col.ColumnName}]";
                 }
@@ -133,19 +134,31 @@ namespace FusionWebApi.Models
             var cmd = new SqlCommand(sql, conn);
             var adp = new SqlDataAdapter(cmd);
             adp.Fill(table);
-           
-            for (int i = 0; i < listofcolumns.Count; i++)
+            for (int j = 0; j < table.Rows.Count; j++)
             {
-                beforedata += $"{listofcolumns[i].ToString()}: {table.Rows[0][listofcolumns[i].ToString()]} ";
+                for (int i = 0; i < listofcolumns.Count; i++)
+                {
+                    beforedata += $"{listofcolumns[i].ToString()}: {table.Rows[j][listofcolumns[i].ToString()]}";
+                }
+                listofrows.Add(beforedata);
+                beforedata = string.Empty;
             }
 
 
-            return beforedata;
+            return listofrows;
         }
         public string EditRecordByColumn(UIPostModel Ed)
         {
+            var param = new Parameters(Ed.TableName, passport);
+            param.Scope = ScopeEnum.Table;
+            param.KeyValue = Ed.keyValue;
+            param.NewRecord = false;
+            param.KeyField = Ed.FieldName;
+            param.BeforeData = "";
+            var ListbeforeDataTrim = GetBeforeDataTrimmed(Ed.PostRow, passport, param);
             var data = DataFieldValues(Ed.PostRow);
-            return Query.UpdateRecordsByColumn(Ed.keyValue, Ed.FieldName, Ed.TableName, passport, data, Ed.IsMultyupdate);
+            var FieldNameType = DatabaseSchema.GetTableSchema(Ed.TableName, passport).ListOfColumns.Where(a => a.ColumnName.ToLower() == Ed.FieldName.ToLower()).FirstOrDefault().DataType;
+            return Query.UpdateRecordsByColumn(Ed.keyValue, Ed.FieldName, Ed.TableName, passport, data, Ed.IsMultyupdate, FieldNameType, ListbeforeDataTrim);
         }
         private List<FieldValue> DataFieldValues(List<PostColumns> ListOfcolumns)
         {
