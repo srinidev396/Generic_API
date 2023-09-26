@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using static FusionWebApi.Models.DatabaseSchema;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Smead.Security;
 
 namespace FusionWebApi.Controllers
 {
@@ -290,8 +291,18 @@ namespace FusionWebApi.Controllers
                     model.ErrorMessages.FusionMessage = "Illegal Data";
                     return model;
                 }
-                model.ErrorMessages.FusionCode = (int)EventCode.RecordUpdated;
+                
                 model.ErrorMessages.FusionMessage = await Task.Run(() => editrecord.EditRecordByColumn(userdata));
+                if(model.ErrorMessages.FusionMessage == "nopermission")
+                {
+                    model.ErrorMessages.FusionMessage = "insufficient permissions to Edit";
+                    model.ErrorMessages.FusionCode = (int)EventCode.insufficientpermissions;
+                    return model;
+                }
+                else
+                {
+                    model.ErrorMessages.FusionCode = (int)EventCode.RecordUpdated;
+                }
                 if (!model.ErrorMessages.FusionMessage.Contains("Updated"))
                 {
                     model.ErrorMessages.FusionCode = 0;
@@ -314,7 +325,7 @@ namespace FusionWebApi.Controllers
         {
             //must be false as we don't support multi add or update in this function.
             //this written just to protect developers in case they setup the property to true.
-            userdata.IsMultyupdate = false;
+           //userdata.IsMultyupdate = false;
 
             var model = new Records();
             model.ErrorMessages.TimeStamp = DateTime.Now;
@@ -344,7 +355,17 @@ namespace FusionWebApi.Controllers
                     return model;
                 }
                 model.ErrorMessages.FusionMessage = await Task.Run(() => record.EditRecordByColumn(userdata));
-                model.ErrorMessages.FusionCode = (int)EventCode.RecordUpdated;
+                if(model.ErrorMessages.FusionMessage == "nopermission")
+                {
+                    model.ErrorMessages.FusionMessage = "insufficient permissions to Edit";
+                    model.ErrorMessages.FusionCode = (int)EventCode.insufficientpermissions;
+                    return model;
+                }
+                else
+                {
+                    model.ErrorMessages.FusionCode = (int)EventCode.RecordUpdated;
+                }
+                
                 if (!model.ErrorMessages.FusionMessage.Contains("Updated"))
                 {
                     model.ErrorMessages.FusionCode = 0;

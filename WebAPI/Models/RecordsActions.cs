@@ -131,7 +131,7 @@ namespace FusionWebApi.Models
                 counter++;
             }
 
-            if(model.keyValue.ToLower() == "null")
+            if (model.keyValue.ToLower() == "null")
             {
                 sql = $"SELECT {columns} FROM {model.TableName} WHERE {model.FieldName} is {model.keyValue}";
             }
@@ -212,11 +212,19 @@ namespace FusionWebApi.Models
             //param.NewRecord = false;
             //param.KeyField = Ed.FieldName;
             //param.BeforeData = "";
+            if (passport.CheckPermission(Ed.TableName, SecureObject.SecureObjectType.Table, Permissions.Permission.Edit))
+            {
             var FieldNameType = DatabaseSchema.GetTableSchema(Ed.TableName, passport).ListOfColumns.Where(a => a.ColumnName.ToLower() == Ed.FieldName.ToLower()).FirstOrDefault().DataType;
             var ListbeforeDataTrim = GetBeforeDataTrimmedEditBycolumn(Ed, passport, FieldNameType);
             var data = DataFieldValues(Ed.PostRow);
-            
             return Query.UpdateRecordsByColumn(Ed.keyValue, Ed.FieldName, Ed.TableName, passport, data, Ed.IsMultyupdate, FieldNameType, ListbeforeDataTrim);
+            
+            }
+            else
+            {
+                return "nopermission";
+            }
+
         }
         private List<FieldValue> DataFieldValues(List<PostColumns> ListOfcolumns)
         {
