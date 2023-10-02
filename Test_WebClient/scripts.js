@@ -1,4 +1,5 @@
-var url = "http://localhost:2234"; //"https://restapi.tabfusionrms.com";
+//var url = "http://localhost:2234";
+var url = "https://restapi.tabfusionrms.com";
 
 var msg = document.getElementById("msgid");
 //authenticate
@@ -25,18 +26,34 @@ function NewRecord() {
     var data = {
         "tableName": "boxes",
         "postRow": [
-            {
-                "value": "48",
-                "columnName": "Descsription"
-            },
-            {
-                "value": "1",
-                "columnName": "yesno"
-            },
-            {
-                "value": "moti test",
-                "columnName": "OffSiteNo"
-            }
+            [
+                {
+                    "value": "48",
+                    "columnName": "Descsription"
+                },
+                {
+                    "value": "1",
+                    "columnName": "yesno"
+                },
+                {
+                    "value": "moti test",
+                    "columnName": "OffSiteNo"
+                }
+            ],
+            [
+                {
+                    "value": "48",
+                    "columnName": "Descsription"
+                },
+                {
+                    "value": "1",
+                    "columnName": "yesno"
+                },
+                {
+                    "value": "moti test",
+                    "columnName": "OffSiteNo"
+                }
+            ]
 
         ]
     }
@@ -46,6 +63,7 @@ function NewRecord() {
         msg.innerHTML = JSON.stringify(data);
     })
 }
+
 
 //software entery.
 //you call fusion api
@@ -81,7 +99,7 @@ function EditRecord() {
 
     var data = {
         "tableName": "Boxes",
-        "keyValue": "3127",
+        "keyValue": "70645",//"3127",
         "fieldName": "id",
         "postRow": [
             {
@@ -107,16 +125,16 @@ function EditRecordByColumn() {
 
     var data = {
         "tableName": "Boxes",
-        "keyValue": "1",
-        "fieldName": "yesno",
+        "keyValue": "null",
+        "fieldName": "memofield",
         "isMultyupdate": true,
         "postRow": [
             {
-                "value": "newoffset",
+                "value": "Hello11",
                 "columnName": "OffSiteNo",
             },
             {
-                "value": "moti",
+                "value": "Hello22",
                 "columnName": "Description",
             }
         ],
@@ -132,16 +150,35 @@ function EditRecordByColumn() {
 function EditIfnotExistAdd() {
     api = "Data/EditIfNotExistAdd";
 
+    /*     var data = {
+            "tableName": "Boxes",
+            "keyValue": "3127",
+            "fieldName": "Id",
+            "postRow": [
+                {
+                    "value": "Hello",
+                    "columnName": "Description"
+                }
+            ],
+        } */
+
+
     var data = {
         "tableName": "Boxes",
-        "keyValue": "3127",
-        "fieldName": "Id",
-        "postRow": [
+        "fieldName": "Desctiption",
+        "keyValue": "Hello22",
+        "isMultyupdate": true,
+        "postRow": [ //this is a test:
             {
-                "value": "Hello",
-                "columnName": "Description"
+                "value": "Test091",
+                "columnName": "QAT1_Name"
+            },
+            {
+                "value": "39",
+                "columnName": "QAT1_Price"
             }
-        ],
+        ]
+
     }
 
     FETCHPOST(api, data).then((data) => {
@@ -173,17 +210,18 @@ function GetTableSchema() {
     })
 }
 
-function GetViewData(){
+function GetViewData() {
     var viewid = 45;
     var pageNumber = 2;
     var api = `Data/GetViewData?viewid=${viewid}&pageNumber=${pageNumber}`
     FETCHGET(api).then((data) => {
-      msg.innerHTML = JSON.stringify(data);
+        msg.innerHTML = JSON.stringify(data);
     });
 }
 
 
 async function FETCHPOST(api, data) {
+    console.log(JSON.stringify(data))
     msg.innerHTML = "Working on it.........";
     var linkurl = `${url}/${api}`;
     const response = await fetch(linkurl, {
