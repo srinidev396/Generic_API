@@ -42,7 +42,6 @@ namespace FusionWebApi.Controllers
             {
                 model.ErrorMessages.Code = ex.HResult;
                 model.ErrorMessages.Message = ex.Message;
-                model.ErrorMessages.TimeStamp = DateTime.Now;
                 _logger.LogError($"{ex.Message} DataBaseName: {passport.DatabaseName} UserName: {passport.UserName}");
 
             }
@@ -64,7 +63,6 @@ namespace FusionWebApi.Controllers
             {
                 model.ErrorMessages.Code = ex.HResult;
                 model.ErrorMessages.Message = ex.Message;
-                model.ErrorMessages.TimeStamp = DateTime.Now;
                 _logger.LogError($"{ex.Message} DataBaseName: {passport.DatabaseName} UserName: {passport.UserName}");
             }
             return model;
@@ -85,7 +83,6 @@ namespace FusionWebApi.Controllers
             {
                 model.ErrorMessages.Code = ex.HResult;
                 model.ErrorMessages.Message = ex.Message;
-                model.ErrorMessages.TimeStamp = DateTime.Now;
                 _logger.LogError($"{ex.Message} DataBaseName: {passport.DatabaseName} UserName: {passport.UserName}");
             }
             return model;
@@ -137,7 +134,6 @@ namespace FusionWebApi.Controllers
             {
                 model.ErrorMessages.Code = ex.HResult;
                 model.ErrorMessages.Message = ex.Message;
-                model.ErrorMessages.TimeStamp = DateTime.Now;
                 _logger.LogError($"{ex.Message} DataBaseName: {passport.DatabaseName} UserName: {passport.UserName}");
             }
             //var rr = HttpContext.Connection.RemoteIpAddress.MapToIPv4();
@@ -181,7 +177,7 @@ namespace FusionWebApi.Controllers
                         return model;
                     }
                 }
-                
+
                 model.ErrorMessages.FusionMessage = await Task.Run(() => addrecord.AddNewRowMulti(userdata));
                 model.ErrorMessages.FusionCode = (int)EventCode.NewRecordsAdded;
                 if (!model.ErrorMessages.FusionMessage.Contains("Added"))
@@ -199,7 +195,6 @@ namespace FusionWebApi.Controllers
             {
                 model.ErrorMessages.Code = ex.HResult;
                 model.ErrorMessages.Message = ex.Message;
-                model.ErrorMessages.TimeStamp = DateTime.Now;
                 _logger.LogError($"{ex.Message} DataBaseName: {passport.DatabaseName} UserName: {passport.UserName}");
             }
             //var rr = HttpContext.Connection.RemoteIpAddress.MapToIPv4();
@@ -222,7 +217,7 @@ namespace FusionWebApi.Controllers
             try
             {
                 var checkcolumns = await Task.Run(() => DatabaseSchema.GetColumntype(passport, userdata));
-                if(checkcolumns != "true")
+                if (checkcolumns != "true")
                 {
                     model.ErrorMessages.FusionMessage = checkcolumns;
                     model.ErrorMessages.FusionCode = (int)EventCode.ColumnIsnotExist;
@@ -253,7 +248,6 @@ namespace FusionWebApi.Controllers
             {
                 model.ErrorMessages.Code = ex.HResult;
                 model.ErrorMessages.Message = ex.Message;
-                model.ErrorMessages.TimeStamp = DateTime.Now;
                 _logger.LogError($"{ex.Message} DataBaseName: {passport.DatabaseName} UserName: {passport.UserName}");
 
             }
@@ -291,9 +285,9 @@ namespace FusionWebApi.Controllers
                     model.ErrorMessages.FusionMessage = "Illegal Data";
                     return model;
                 }
-                
+
                 model.ErrorMessages.FusionMessage = await Task.Run(() => editrecord.EditRecordByColumn(userdata));
-                if(model.ErrorMessages.FusionMessage == "nopermission")
+                if (model.ErrorMessages.FusionMessage == "nopermission")
                 {
                     model.ErrorMessages.FusionMessage = "insufficient permissions to Edit";
                     model.ErrorMessages.FusionCode = (int)EventCode.insufficientpermissions;
@@ -314,7 +308,6 @@ namespace FusionWebApi.Controllers
             {
                 model.ErrorMessages.Code = ex.HResult;
                 model.ErrorMessages.Message = ex.Message;
-                model.ErrorMessages.TimeStamp = DateTime.Now;
                 _logger.LogError($"{ex.Message} DataBaseName: {passport.DatabaseName} UserName: {passport.UserName}");
             }
             return model;
@@ -323,21 +316,25 @@ namespace FusionWebApi.Controllers
         [Route("EditIfNotExistAdd")]
         public async Task<Records> EditIfNotExistAdd(UIPostModel userdata)
         {
-            //must be false as we don't support multi add or update in this function.
-            //this written just to protect developers in case they setup the property to true.
-           //userdata.IsMultyupdate = false;
-
             var model = new Records();
             model.ErrorMessages.TimeStamp = DateTime.Now;
+            //to use this method the developer must have an account with add\edit permission
+            //so first we check for permissions
+            var m = new SecurityAccess(_config);
+            var passport = m.GetPassport(User.Identity.Name);
+            if (!passport.CheckPermission(userdata.TableName, SecureObject.SecureObjectType.Table, Permissions.Permission.Edit) ||
+                !passport.CheckPermission(userdata.TableName, SecureObject.SecureObjectType.Table, Permissions.Permission.Add))
+            {
+                model.ErrorMessages.FusionCode = (int)EventCode.insufficientpermissions;
+                model.ErrorMessages.FusionMessage = "Insufficient permissions to modify or add data.";
+                return model;
+            }
             if (userdata.PostRow.Count == 0)
             {
                 model.ErrorMessages.FusionCode = (int)EventCode.NoColumn;
                 model.ErrorMessages.FusionMessage = "No column to post";
                 return model;
             }
-
-            var m = new SecurityAccess(_config);
-            var passport = m.GetPassport(User.Identity.Name);
             try
             {
                 var checkcolumns = await Task.Run(() => DatabaseSchema.GetColumntype(passport, userdata));
@@ -355,7 +352,7 @@ namespace FusionWebApi.Controllers
                     return model;
                 }
                 model.ErrorMessages.FusionMessage = await Task.Run(() => record.EditRecordByColumn(userdata));
-                if(model.ErrorMessages.FusionMessage == "nopermission")
+                if (model.ErrorMessages.FusionMessage == "nopermission")
                 {
                     model.ErrorMessages.FusionMessage = "insufficient permissions to Edit";
                     model.ErrorMessages.FusionCode = (int)EventCode.insufficientpermissions;
@@ -365,7 +362,7 @@ namespace FusionWebApi.Controllers
                 {
                     model.ErrorMessages.FusionCode = (int)EventCode.RecordUpdated;
                 }
-                
+
                 if (!model.ErrorMessages.FusionMessage.Contains("Updated"))
                 {
                     model.ErrorMessages.FusionCode = 0;
@@ -391,7 +388,6 @@ namespace FusionWebApi.Controllers
             {
                 model.ErrorMessages.Code = ex.HResult;
                 model.ErrorMessages.Message = ex.Message;
-                model.ErrorMessages.TimeStamp = DateTime.Now;
                 _logger.LogError($"{ex.Message} DataBaseName: {passport.DatabaseName} UserName: {passport.UserName}");
             }
             return model;
@@ -448,8 +444,6 @@ namespace FusionWebApi.Controllers
                     getview.ErrorMessages.FusionCode = (int)EventCode.WrongValue;
                     getview.ErrorMessages.FusionMessage = $"View {viewid} is not found";
                 }
-
-                getview.ErrorMessages.TimeStamp = DateTime.Now;
                 _logger.LogError($"{ex.Message} DataBaseName: {passport.DatabaseName} UserName: {passport.UserName}");
             }
 
