@@ -142,8 +142,8 @@ namespace FusionWebApi.Controllers
         [HttpPost]
         [Route("NewRecordMulti")]
         //[RequestSizeLimit(100_000_000)]
-        [DisableRequestSizeLimit]
-        //[RequestSizeLimit(1048576)] limit to 1mb
+        //[DisableRequestSizeLimit]
+        [RequestSizeLimit(52428800)] //limit to 1mb
         public async Task<Records> NewRecordMulti(UIPostModel userdata)
         {
             var model = new Records();
