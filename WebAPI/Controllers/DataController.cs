@@ -317,6 +317,7 @@ namespace FusionWebApi.Controllers
         public async Task<Records> EditIfNotExistAdd(UIPostModel userdata)
         {
             var model = new Records();
+            model.ErrorMessages.Message = "";
             model.ErrorMessages.TimeStamp = DateTime.Now;
             //to use this method the developer must have an account with add\edit permission
             //so first we check for permissions
@@ -376,6 +377,7 @@ namespace FusionWebApi.Controllers
                     {
                         model.ErrorMessages.FusionCode = (int)EventCode.NewRecordAdded;
                         model.ErrorMessages.FusionMessage = $"New Record Added!";
+                        model.ErrorMessages.Message = "";
                     }
                     else
                     {
