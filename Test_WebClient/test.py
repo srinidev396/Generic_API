@@ -1,5 +1,6 @@
 import httpx
 import asyncio
+import unittest
 
 url = "https://restapi.tabfusionrms.com"
 msg = ""
@@ -19,7 +20,7 @@ async def Auth():
         if response.status_code != 200:
             return response
         token = response.json()["token"]
-        print(token)
+        return token
 
 async def NewRecord():
     api = "Data/NewRecord"
@@ -82,6 +83,24 @@ async def FETCHGET(api):
         else:
             print(response.json())
 
+    
+
+def add(a, b):
+    return a + b
+
+class TestAPI(unittest.TestCase):
+ def check_token(self):
+        Auth()
+        self.assertEquals(token, '')
+
+"""     def test_add_negative_numbers(self):
+       result = add(3, 3)
+       self.assertEqual(result, 6) """
+    
+    
+
+
 if __name__ == '__main__':
-    asyncio.run(Auth()) 
-    asyncio.run(NewRecord())
+    #asyncio.run(Auth())
+    unittest.main()
+    #asyncio.run(NewRecord())
