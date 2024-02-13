@@ -1,6 +1,7 @@
 import httpx
 import asyncio
 import unittest
+import openai
 
 url = "https://restapi.tabfusionrms.com"
 msg = ""

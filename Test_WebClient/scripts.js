@@ -39,22 +39,7 @@ function NewRecord() {
                     "value": "moti test",
                     "columnName": "OffSiteNo"
                 }
-            ],
-            [
-                {
-                    "value": "48",
-                    "columnName": "Descsription"
-                },
-                {
-                    "value": "1",
-                    "columnName": "yesno"
-                },
-                {
-                    "value": "moti test",
-                    "columnName": "OffSiteNo"
-                }
             ]
-
         ]
     }
     FETCHPOST(api, data).then((data) => {
@@ -99,7 +84,7 @@ function EditRecord() {
 
     var data = {
         "tableName": "Boxes",
-        "keyValue": "70645",//"3127",
+        "keyValue": "70645",
         "fieldName": "id",
         "postRow": [
             {
@@ -150,32 +135,15 @@ function EditRecordByColumn() {
 function EditIfnotExistAdd() {
     api = "Data/EditIfNotExistAdd";
 
-    /*     var data = {
-            "tableName": "Boxes",
-            "keyValue": "3127",
-            "fieldName": "Id",
-            "postRow": [
-                {
-                    "value": "Hello",
-                    "columnName": "Description"
-                }
-            ],
-        } */
-
-
-    var data = {
+      var data = {
         "tableName": "Boxes",
-        "fieldName": "Desctiption",
-        "keyValue": "Hello22",
+        "fieldName": "Description",
+        "keyValue": "value-exist",
         "isMultyupdate": true,
         "postRow": [ //this is a test:
             {
-                "value": "Test091",
-                "columnName": "QAT1_Name"
-            },
-            {
-                "value": "39",
-                "columnName": "QAT1_Price"
+                "value": "1",
+                "columnName": "Description"
             }
         ]
 
