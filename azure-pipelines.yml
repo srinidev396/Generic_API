@@ -17,7 +17,7 @@ stages:
       displayName: 'Install .NET Core sdk'
       inputs:
         packageType: 'sdk'
-        version: '6.9.2'  
+        version: '8.0.3'  
 
     - script: dotnet restore
       displayName: 'Restore dependencies'
@@ -38,7 +38,7 @@ stages:
       displayName: 'Install .NET Core sdk'
       inputs:
         packageType: 'sdk'
-        version: '6.9.2'  
+        version: '8.0.3'  
 
     - task: DotNetCoreCLI@2
       displayName: 'Publish to Azure Web App'
