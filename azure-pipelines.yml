@@ -1,31 +1,36 @@
 trigger:
   branches:
-    include:     
-      - main  
-
+    include:
+      - main
+      
 pool:
   name: Default
 
 stages:
 - stage: Build
-  displayName: 'Build and Test'
+  displayName: 'Build Docker Image and Test'
   jobs:
   - job: CI
     displayName: 'Continuous Integration'
     steps:
-    - task: UseDotNet@2
-      displayName: 'Install .NET Core sdk'
-      inputs:
-        packageType: 'sdk'
-        version: '8.x'  
+    - script: |
+        echo 'Building Docker image...'
+        docker build -t myapp:latest .
+      displayName: 'Build Docker Image'
 
-    - script: dotnet restore
-      displayName: 'Restore dependencies'
+    - script: |
+        echo 'Logging in to Azure Container Registry...'
+        az acr login --name azuredevopspoc.azurecr.io --username AzureDevOpsPOC --password <ACR password>
 
-    - script: dotnet build --configuration Release
-      displayName: 'Build application'
+    - script: |
+        echo 'Pushing Docker image to Azure Container Registry...'
+        docker tag myapp:latest azuredevopspoc.azurecr.io/myapp:latest
+        docker push azuredevopspoc.azurecr.io/myapp:latest
+      displayName: 'Push Docker Image to ACR'
 
-    - script: dotnet test
+    - script: |
+        echo 'Running tests...'
+        # Add your test commands here
       displayName: 'Run tests'
 
 - stage: Deploy
@@ -38,15 +43,14 @@ stages:
       displayName: 'Install .NET Core sdk'
       inputs:
         packageType: 'sdk'
-        version: '8.x'  
+        version: '8.x'  # Use version 8.x for .NET Core 3.1
 
-    - task: DotNetCoreCLI@2
-      displayName: 'Publish to Azure Web App'
+    - task: Docker@2
+      displayName: 'Pull Docker Image'
       inputs:
-        command: 'publish'
-        publishWebProjects: true
-        arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)'
-        zipAfterPublish: true
+        command: 'pull'
+        repository: 'azuredevopspoc.azurecr.io/myapp'
+        tags: 'latest'
 
     - task: AzureRmWebAppDeployment@4
       displayName: 'Azure Web App Deploy'
