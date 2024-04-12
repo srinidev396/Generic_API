@@ -1,0 +1,64 @@
+trigger:
+  branches:
+    include:
+      - main
+      
+pool:
+  name: Default
+
+stages:
+- stage: Build
+  displayName: 'Build Docker Image and Test'
+  jobs:
+  - job: CI
+    displayName: 'Continuous Integration'
+    steps:
+    - script: |
+        echo 'Building Docker image...'
+        docker build -t myapp:latest .
+      displayName: 'Build Docker Image'
+
+    - script: |
+        echo 'Logging in to Azure Container Registry...'
+        az acr login --name azuredevopspoc.azurecr.io --username AzureDevOpsPOC --password igqOB3FnhdDgnblFJOISAI5S4YIPUdCKF2PFl730Qy+ACRAp+ZEC
+
+    - script: |
+        echo 'Pushing Docker image to Azure Container Registry...'
+        docker tag myapp:latest azuredevopspoc.azurecr.io/myapp:latest
+        docker push azuredevopspoc.azurecr.io/myapp:latest
+      displayName: 'Push Docker Image to ACR'
+
+    - script: |
+        echo 'Running tests...'
+        # Add your test commands here
+      displayName: 'Run tests'
+
+- stage: Deploy
+  displayName: 'Deploy to Azure Web App'
+  jobs:
+  - job: CD
+    displayName: 'Continuous Deployment'
+    steps:
+    - task: UseDotNet@2
+      displayName: 'Install .NET Core sdk'
+      inputs:
+        packageType: 'sdk'
+        version: '8.x'  # Use version 8.x for .NET Core 3.1
+
+    - task: Docker@2
+      displayName: 'Pull Docker Image'
+      inputs:
+        command: 'pull'
+        repository: 'azuredevopspoc.azurecr.io/myapp'
+        tags: 'latest'
+
+    - task: AzureRmWebAppDeployment@4
+      displayName: 'Azure Web App Deploy'
+      inputs:
+        ConnectionType: 'AzureRM'
+        azureSubscription: 'Azure_DevOps_Service_Connection'
+        appType: 'webApp'
+        WebAppName: 'Tab-WebApp'
+        packageForLinux: '$(Build.ArtifactStagingDirectory)/*/.zip'
+        enableCustomDeployment: true
+        deploymentMethod: 'zipDeploy'
