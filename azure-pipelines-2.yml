@@ -7,31 +7,31 @@ pool:
   name: Default
 
 stages:
-- stage: Build
-  displayName: 'Build Docker Image and Test'
-  jobs:
-  - job: CI
-    displayName: 'Continuous Integration'
-    steps:
-    - script: |
-        echo 'Building Docker image...'
-        docker build -t myapp:latest .
-      displayName: 'Build Docker Image'
+# - stage: Build
+#   displayName: 'Build Docker Image and Test'
+#   jobs:
+#   - job: CI
+#     displayName: 'Continuous Integration'
+#     steps:
+#     - script: |
+#         echo 'Building Docker image...'
+#         docker build -t myapp:latest .
+#       displayName: 'Build Docker Image'
 
-    - script: |
-        echo 'Logging in to Azure Container Registry...'
-        az acr login --name azuredevopspoc.azurecr.io --username AzureDevOpsPOC --password igqOB3FnhdDgnblFJOISAI5S4YIPUdCKF2PFl730Qy+ACRAp+ZEC
+#     - script: |
+#         echo 'Logging in to Azure Container Registry...'
+#         az acr login --name azuredevopspoc.azurecr.io --username AzureDevOpsPOC --password igqOB3FnhdDgnblFJOISAI5S4YIPUdCKF2PFl730Qy+ACRAp+ZEC
 
-    - script: |
-        echo 'Pushing Docker image to Azure Container Registry...'
-        docker tag myapp:latest azuredevopspoc.azurecr.io/myapp:latest
-        docker push azuredevopspoc.azurecr.io/myapp:latest
-      displayName: 'Push Docker Image to ACR'
+#     - script: |
+#         echo 'Pushing Docker image to Azure Container Registry...'
+#         docker tag myapp:latest azuredevopspoc.azurecr.io/myapp:latest
+#         docker push azuredevopspoc.azurecr.io/myapp:latest
+#       displayName: 'Push Docker Image to ACR'
 
-    - script: |
-        echo 'Running tests...'
-        # Add your test commands here
-      displayName: 'Run tests'
+#     - script: |
+#         echo 'Running tests...'
+#         # Add your test commands here
+#       displayName: 'Run tests'
 
 - stage: Deploy
   displayName: 'Deploy to Azure Web App'
