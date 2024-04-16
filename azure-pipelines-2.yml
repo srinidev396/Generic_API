@@ -16,5 +16,5 @@ steps:
     ConnectionType: 'AzureRM'
     azureSubscription: 'Azure_DevOps_Service_Connection'
     appType: 'webApp'
-    WebAppName: 'Tab_WebApp'
+    WebAppName: 'Tab-WebApp'
     packageForLinux: '$(Build.SourcesDirectory)'
